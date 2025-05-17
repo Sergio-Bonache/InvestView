@@ -78,19 +78,19 @@ const totalConInteresSerie = computed(() =>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="capitalInicial">
-            Capital inicial (€)
+            <span class="text-red-700 font-medium">*</span> Capital inicial (€)
           </label>
           <input id="capitalInicial" type="number" min="0" v-model.number="capitalInicial" class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" />
         </div>
         <div>
           <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="aportacion">
-            Aportación periódica (€)
+            <span class="text-red-700 font-medium">*</span> Aportación periódica (€)
           </label>
           <input id="aportacion" type="number" min="0" v-model.number="aportacion" class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" />
         </div>
         <div>
           <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="frecuencia">
-            Frecuencia de aportación
+            <span class="text-red-700 font-medium">*</span> Frecuencia de aportación
           </label>
           <select id="frecuencia" v-model="frecuencia" class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none">
             <option v-for="op in frecuenciaOpciones" :key="op.value" :value="op.value">{{ op.label }}</option>
@@ -98,13 +98,13 @@ const totalConInteresSerie = computed(() =>
         </div>
         <div>
           <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="interes">
-            Interés anual (%)
+            <span class="text-red-700 font-medium">*</span> Interés anual (%)
           </label>
           <input id="interes" type="number" min="0" step="0.01" v-model.number="interes" class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" />
         </div>
         <div class="md:col-span-2">
           <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="tiempo">
-            Tiempo (años)
+            <span class="text-red-700 font-medium">*</span> Tiempo (años)
           </label>
           <input id="tiempo" type="number" min="1" v-model.number="tiempo" class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" />
         </div>

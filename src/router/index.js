@@ -43,7 +43,7 @@ const router = createRouter({
       component: AvailableAssets
     },
     {
-      path: '/calculadoras/interes_compuesto',
+      path: '/calculator/compound_interest',
       name: 'CalculadoraInteresCompuesto',
       component: CalculadoraInteresCompuesto
     },

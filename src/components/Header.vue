@@ -35,9 +35,9 @@ function cerrarSesion() {
       <div class="hidden lg:flex items-center justify-center flex-grow space-x-6">
         <!-- Opciones de navbar para usuarios sin registrar -->
         <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/assets">Activos Disponibles</RouterLink>
-        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/portafolio">Mi Portafolio</RouterLink>
-        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/calculadoras/interes_compuesto">Calculadora de Interés Compuesto</RouterLink>
-        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/contacto">Contacto</RouterLink>
+        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/portfolio">Mi Portafolio</RouterLink>
+        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/calculator/compound_interest">Calculadora de Interés Compuesto</RouterLink>
+        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/contact">Contacto</RouterLink>
 
         <RouterLink v-if="datosUsuario?.role == 'admin'" class="text-gray-700 hover:text-black-600" to="/crearActivo">
           Añadir Activo</RouterLink>
