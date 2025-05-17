@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 
 const activos = ref([]);
 const error = ref("");
@@ -8,6 +8,10 @@ const itemsPerPage = 12;
 
 // Buscador
 const searchText = ref("");
+
+watch(searchText, () => {
+    currentPage.value = 1;
+});
 
 onMounted(async () => {
     try {

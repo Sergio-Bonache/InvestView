@@ -5,6 +5,7 @@ import SignUpView from '../views/auth/SignUpView.vue'
 import UserManagement from '../views/admin/UserManagement.vue'
 import AssetManagement from '../views/admin/AssetManagement.vue'
 import AvailableAssets from '../views/user/AvailableAssets.vue'
+import CalculadoraInteresCompuesto from '../views/CalculadoraInteresCompuesto.vue';
 import NotFound from '../views/NotFound.vue'
 
 
@@ -40,6 +41,11 @@ const router = createRouter({
       path: '/assets',
       name: 'AvailableAssets',
       component: AvailableAssets
+    },
+    {
+      path: '/calculadoras/interes_compuesto',
+      name: 'CalculadoraInteresCompuesto',
+      component: CalculadoraInteresCompuesto
     },
     { 
       path: '/:pathMatch(.*)*', 
