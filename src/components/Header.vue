@@ -39,7 +39,7 @@ function cerrarSesion() {
         <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/calculator/compound_interest">Calculadora de Interés Compuesto</RouterLink>
         <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/contact">Contacto</RouterLink>
 
-        <RouterLink v-if="datosUsuario?.role == 'admin'" class="text-gray-700 hover:text-black-600" to="/crearActivo">
+        <RouterLink v-if="datosUsuario?.role == 'admin'" class="text-gray-700 hover:text-black-600" to="/admin/assets/add">
           Añadir Activo</RouterLink>
         <RouterLink v-if="datosUsuario?.role == 'admin'" class="text-gray-700 hover:text-black-600" to="/admin/assets">
           Gestionar Activos</RouterLink>

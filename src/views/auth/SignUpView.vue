@@ -7,6 +7,15 @@ const form = ref({ nombreUsuario: '', email: '', password: '', confirmPassword: 
 const error = ref('');
 const showModal = ref(false); // Controla la visibilidad del modal
 
+function validarPassword(password) {
+  // Al menos 8 caracteres, una mayúscula y un símbolo
+  return (
+    password.length > 8 &&
+    /[A-Z]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  );
+}
+
 async function registrarUsuario() {
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
@@ -24,6 +33,9 @@ async function registrarUsuario() {
     return;
   } else if (form.value.password !== form.value.confirmPassword) {
     error.value = 'Las contraseñas no coinciden.';
+    return;
+  } else if (!validarPassword(form.value.password)) {
+    error.value = 'La contraseña debe tener más de 8 caracteres, al menos una mayúscula y un símbolo.';
     return;
   }
 

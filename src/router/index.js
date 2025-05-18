@@ -4,6 +4,7 @@ import LoginView from '../views/auth/LoginView.vue'
 import SignUpView from '../views/auth/SignUpView.vue'
 import UserManagement from '../views/admin/UserManagement.vue'
 import AssetManagement from '../views/admin/AssetManagement.vue'
+import AddAsset from '../views/admin/AddAsset.vue'
 import AvailableAssets from '../views/user/AvailableAssets.vue'
 import CalculadoraInteresCompuesto from '../views/CalculadoraInteresCompuesto.vue';
 import NotFound from '../views/NotFound.vue'
@@ -36,6 +37,11 @@ const router = createRouter({
       path: '/admin/assets',
       name: 'AdminAssets',
       component: AssetManagement
+    },
+    {
+      path: '/admin/assets/add',
+      name: 'AddAsset',
+      component: AddAsset
     },
     {
       path: '/assets',
