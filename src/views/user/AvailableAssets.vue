@@ -2,8 +2,6 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 
-const route = useRoute();
-
 const activos = ref([]);
 const error = ref("");
 const currentPage = ref(1);

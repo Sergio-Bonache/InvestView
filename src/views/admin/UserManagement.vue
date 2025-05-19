@@ -1,6 +1,15 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
+
+const sesion = localStorage.getItem("sesion");
+const rol = sesion ? JSON.parse(sesion).role : null;
+
+if (rol != "admin") {
+  router.push("/");
+}
 const usuarios = ref([]); // Estado reactivo para almacenar los usuarios
 const error = ref(""); // Estado para manejar errores
 const showEditModal = ref(false); // Controla la visibilidad del modal de edición

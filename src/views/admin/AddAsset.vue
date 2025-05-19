@@ -1,8 +1,16 @@
 <script setup>
+
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+
+const sesion = localStorage.getItem("sesion");
+const rol = sesion ? JSON.parse(sesion).role : null;
+
+if (rol != "admin") {
+  router.push("/");
+}
 
 const form = ref({
   name: "",
