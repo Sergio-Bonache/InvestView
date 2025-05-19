@@ -35,10 +35,10 @@ function loadWidget() {
     symbols: [[props.symbol]],
     chartOnly: false,
     width: "100%",
-    height: "100%",
+    height: 400,
     locale: "es",
     colorTheme: "light",
-    autosize: true,
+    autosize: false,
     showVolume: false,
     showMA: false,
     hideDateRanges: false,
@@ -47,7 +47,7 @@ function loadWidget() {
     scalePosition: "right",
     scaleMode: "Normal",
     fontFamily: "Trebuchet MS, sans-serif",
-    fontSize: "10",
+    fontSize: "15",
     noTimeScale: false,
     valuesTracking: "1",
     changeMode: "price-and-percent",
@@ -57,7 +57,7 @@ function loadWidget() {
     maLength: 9,
     headerFontSize: "large",
     lineWidth: 2,
-    lineType: 0,
+    lineType: 1,
     dateRanges: [
       "1d|1",
       "1m|30",
@@ -73,5 +73,5 @@ function loadWidget() {
 </script>
 
 <template>
-  <div :id="widgetContainerId" class="h-[400px] mb-8"></div>
+  <div :id="widgetContainerId" class="h-[400px]"></div>
 </template>

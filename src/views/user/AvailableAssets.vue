@@ -1,5 +1,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const activos = ref([]);
 const error = ref("");
@@ -68,7 +71,10 @@ function cambiarPagina(pagina) {
             </div>
         </div>
         <div class="grid grid-cols-1 mt-15 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <a v-for="(activo, index) in activosPaginados" :key="index" href="#"
+            <RouterLink
+                v-for="(activo, index) in activosPaginados"
+                :key="index"
+                :to="`/assets/${activo.trading_view_symbol}`"
                 class="block rounded-md border border-gray-300 p-4 shadow-sm sm:p-6">
                 <div class="sm:flex sm:justify-between sm:gap-4 lg:gap-6">
                     <div class="sm:order-last sm:shrink-0">
@@ -83,7 +89,7 @@ function cambiarPagina(pagina) {
                         </p>
                     </div>
                 </div>
-            </a>
+            </RouterLink>
         </div>
         <div class="flex items-center justify-between mt-9">
             <button @click="cambiarPagina(currentPage - 1)" :disabled="currentPage === 1"

@@ -6,6 +6,7 @@ import UserManagement from '../views/admin/UserManagement.vue'
 import AssetManagement from '../views/admin/AssetManagement.vue'
 import AddAsset from '../views/admin/AddAsset.vue'
 import AvailableAssets from '../views/user/AvailableAssets.vue'
+import SpecificAsset from '../views/user/SpecificAsset.vue'
 import CalculadoraInteresCompuesto from '../views/CalculadoraInteresCompuesto.vue';
 import NotFound from '../views/NotFound.vue'
 
@@ -47,6 +48,11 @@ const router = createRouter({
       path: '/assets',
       name: 'AvailableAssets',
       component: AvailableAssets
+    },
+    {
+      path: '/assets/:ticker',
+      name: 'SpecificAsset',
+      component: SpecificAsset
     },
     {
       path: '/calculator/compound_interest',
