@@ -89,9 +89,10 @@ async function actualizarTieneActivo() {
     const res = await fetch(`http://localhost:3000/transactions/user/${sesion.value.id}/asset/${asset.value.id}/quantity`);
     if (res.ok) {
       const data = await res.json();
-      tieneActivo.value = Number(data.quantity) > 0;
+      tieneActivo.value = data.total_quantity > 0;
     } else {
       tieneActivo.value = false;
+      console.log("carmelo");
     }
   }
 }
