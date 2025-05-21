@@ -7,7 +7,9 @@ import AssetManagement from '../views/admin/AssetManagement.vue'
 import AddAsset from '../views/admin/AddAsset.vue'
 import AvailableAssets from '../views/user/AvailableAssets.vue'
 import SpecificAsset from '../views/user/SpecificAsset.vue'
+import Portfolio from '../views/user/Portfolio.vue'
 import CalculadoraInteresCompuesto from '../views/CalculadoraInteresCompuesto.vue';
+import CalculadoraHipotecas from '../views/CalculadoraHipotecas.vue';
 import NotFound from '../views/NotFound.vue'
 
 
@@ -50,6 +52,11 @@ const router = createRouter({
       component: AvailableAssets
     },
     {
+      path: '/portfolio',
+      name: 'Portfolio',
+      component: Portfolio
+    },
+    {
       path: '/assets/:ticker',
       name: 'SpecificAsset',
       component: SpecificAsset
@@ -58,6 +65,11 @@ const router = createRouter({
       path: '/calculator/compound_interest',
       name: 'CalculadoraInteresCompuesto',
       component: CalculadoraInteresCompuesto
+    },
+    {
+      path: '/calculator/mortgage',
+      name: 'CalculadoraHipotecas',
+      component: CalculadoraHipotecas
     },
     { 
       path: '/:pathMatch(.*)*', 

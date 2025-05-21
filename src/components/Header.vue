@@ -37,7 +37,7 @@ function cerrarSesion() {
         <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/assets">Activos Disponibles</RouterLink>
         <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/portfolio">Mi Portafolio</RouterLink>
         <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/calculator/compound_interest">Calculadora de Interés Compuesto</RouterLink>
-        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/contact">Contacto</RouterLink>
+        <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/calculator/mortgage">Calculadora de hipotecas</RouterLink>
 
         <RouterLink v-if="datosUsuario?.role == 'admin'" class="text-gray-700 hover:text-black-600" to="/admin/assets/add">
           Añadir Activo</RouterLink>

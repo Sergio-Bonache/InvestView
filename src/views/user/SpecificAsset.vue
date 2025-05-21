@@ -8,6 +8,7 @@ const asset = ref(null);
 const error = ref("");
 const sesion = ref(null);
 const tieneActivo = ref(false);
+const total_quantity = ref(0);
 
 const showAddModal = ref(false);
 const showSubtractModal = ref(false);
@@ -28,8 +29,8 @@ function sustraerDePortafolio() {
 
 async function confirmarAnadir() {
   addError.value = "";
-  if (!cantidad.value || cantidad.value <= 0) {
-    addError.value = "Introduce una cantidad válida mayor que 0.";
+  if (!cantidad.value || cantidad.value <= 0.01) {
+    addError.value = "Introduce una cantidad mayor que 0,01€.";
     return;
   }
   try {
@@ -57,17 +58,22 @@ async function confirmarAnadir() {
 
 async function confirmarSustraer() {
   subtractError.value = "";
-  if (!cantidad.value || cantidad.value <= 0) {
-    subtractError.value = "Introduce una cantidad válida mayor que 0.";
+  if (!cantidad.value || cantidad.value <= 0.01 || cantidad.value > total_quantity.value) {
+    if (cantidad.value > total_quantity.value) {
+      subtractError.value = "No puedes sustraer más de lo que tienes.";
+    } else if (cantidad.value <= 0) {
+      subtractError.value = "Introduce una cantidad mayor que 0,01€.";
+    }
     return;
   }
   try {
-    const response = await fetch("http://localhost:3000/portfolio/remove", {
+    const response = await fetch("http://localhost:3000/transactions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: sesion.value.id,
-        assetId: asset.value.id,
+        user_id: sesion.value.id,
+        asset_id: asset.value.id,
+        transaction_type: "venta",
         quantity: cantidad.value,
       }),
     });
@@ -90,6 +96,7 @@ async function actualizarTieneActivo() {
     if (res.ok) {
       const data = await res.json();
       tieneActivo.value = data.total_quantity > 0;
+      total_quantity.value = data.total_quantity;
     } else {
       tieneActivo.value = false;
       console.log("carmelo");
@@ -179,17 +186,17 @@ onMounted(async () => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity">
       <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
         <h2 class="text-2xl font-bold mb-4 text-gray-800">Añadir a portafolio</h2>
-        <label class="block mb-2 text-lg text-gray-700">Cantidad a añadir</label>
-        <input v-model.number="cantidad" type="number" min="1"
+        <label class="block mb-2 text-xl font-semibold text-gray-700">Cantidad actual: {{ total_quantity }}€</label>
+        <input v-model.number="cantidad" type="number" min="1" placeholder="Cantidad a añadir en €"
           class="w-full border border-gray-300 rounded-md text-lg px-4 py-2 mb-4" />
-        <div v-if="addError" class="text-red-600 text-sm mb-2">{{ addError }}</div>
+        <div v-if="addError" class="text-red-600 text-m mb-2">{{ addError }}</div>
         <div class="flex justify-end space-x-4">
           <button @click="showAddModal = false"
             class="w-1/2 px-4 py-2 text-gray-900 font-bold text-lg rounded-md hover:bg-gray-300">
             Cancelar
           </button>
           <button @click="confirmarAnadir"
-            class="w-1/2 px-4 py-2 bg-blue-600 text-white text-lg rounded-md hover:bg-blue-700">
+            class="w-1/2 px-4 py-2 bg-blue-600 text-white text-xl rounded-md hover:bg-blue-700">
             Añadir
           </button>
         </div>
@@ -201,17 +208,17 @@ onMounted(async () => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity">
       <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
         <h2 class="text-2xl font-bold mb-4 text-gray-800">Sustraer de portafolio</h2>
-        <label class="block mb-2 text-lg text-gray-700">Cantidad a sustraer</label>
-        <input v-model.number="cantidad" type="number" min="1"
+        <label class="block mb-2 text-xl font-semibold text-gray-700">Cantidad actual: {{ total_quantity }}€</label>
+        <input v-model.number="cantidad" type="number" min="1" placeholder="Cantidad a añadir en €"
           class="w-full border border-gray-300 rounded-md text-lg px-4 py-2 mb-4" />
-        <div v-if="subtractError" class="text-red-600 text-sm mb-2">{{ subtractError }}</div>
+        <div v-if="subtractError" class="text-red-600 text-m mb-2">{{ subtractError }}</div>
         <div class="flex justify-end space-x-4">
           <button @click="showSubtractModal = false"
             class="w-1/2 px-4 py-2 text-gray-900 font-bold text-lg rounded-md hover:bg-gray-300">
             Cancelar
           </button>
           <button @click="confirmarSustraer"
-            class="w-1/2 px-4 py-2 bg-red-600 text-white text-lg rounded-md hover:bg-red-700">
+            class="w-1/2 px-4 py-2 bg-red-600 text-white text-xl rounded-md hover:bg-red-700">
             Sustraer
           </button>
         </div>
