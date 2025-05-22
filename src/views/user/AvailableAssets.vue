@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
+import axios from "axios";
 
 const activos = ref([]);
 const error = ref("");
@@ -16,10 +17,10 @@ watch(searchText, () => {
 
 onMounted(async () => {
     try {
-        const response = await fetch("http://localhost:3000/assets");
-        if (!response.ok) throw new Error("Error al obtener los activos.");
-        activos.value = await response.json();
+        const response = await axios.get("http://localhost:3000/assets");
+        activos.value = response.data;
     } catch (e) {
+        error.value = e.response?.data?.message || "Error al obtener los activos.";
         activos.value = [];
     }
 });

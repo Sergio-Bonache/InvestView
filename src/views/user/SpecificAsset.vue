@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import TradingViewWidget from "@/components/TradingViewWidget.vue";
+import axios from "axios";
 
 const route = useRoute();
 const asset = ref(null);
@@ -34,25 +35,16 @@ async function confirmarAnadir() {
     return;
   }
   try {
-    const response = await fetch("http://localhost:3000/transactions/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user_id: sesion.value.id,
-        asset_id: asset.value.id,
-        transaction_type: "compra",
-        quantity: cantidad.value,
-      }),
+    await axios.post("http://localhost:3000/transactions/", {
+      user_id: sesion.value.id,
+      asset_id: asset.value.id,
+      transaction_type: "compra",
+      quantity: cantidad.value,
     });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      addError.value = data.message || "Error al añadir al portafolio.";
-      return;
-    }
     showAddModal.value = false;
     await actualizarTieneActivo();
   } catch (e) {
-    addError.value = "Error de red al añadir al portafolio.";
+    addError.value = e.response?.data?.message || "Error de red al añadir al portafolio.";
   }
 }
 
@@ -67,39 +59,29 @@ async function confirmarSustraer() {
     return;
   }
   try {
-    const response = await fetch("http://localhost:3000/transactions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user_id: sesion.value.id,
-        asset_id: asset.value.id,
-        transaction_type: "venta",
-        quantity: cantidad.value,
-      }),
+    await axios.post("http://localhost:3000/transactions", {
+      user_id: sesion.value.id,
+      asset_id: asset.value.id,
+      transaction_type: "venta",
+      quantity: cantidad.value,
     });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      subtractError.value = data.message || "Error al sustraer del portafolio.";
-      return;
-    }
     showSubtractModal.value = false;
     await actualizarTieneActivo();
   } catch (e) {
-    subtractError.value = "Error de red al sustraer del portafolio.";
+    subtractError.value = e.response?.data?.message || "Error de red al sustraer del portafolio.";
   }
 }
 
 // Obtiene la suma de quantity del usuario para este activo
 async function actualizarTieneActivo() {
   if (sesion.value && asset.value) {
-    const res = await fetch(`http://localhost:3000/transactions/user/${sesion.value.id}/asset/${asset.value.id}/quantity`);
-    if (res.ok) {
-      const data = await res.json();
-      tieneActivo.value = data.total_quantity > 0;
-      total_quantity.value = data.total_quantity;
-    } else {
+    try {
+      const response = await axios.get(`http://localhost:3000/transactions/user/${sesion.value.id}/asset/${asset.value.id}/quantity`);
+      tieneActivo.value = response.data.total_quantity > 0;
+      total_quantity.value = response.data.total_quantity;
+    } catch (e) {
       tieneActivo.value = false;
-      console.log("carmelo");
+      console.error("Error al obtener la cantidad del activo:", e);
     }
   }
 }
@@ -108,16 +90,14 @@ onMounted(async () => {
   sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
   try {
     const symbol = route.params.ticker;
-    const response = await fetch(`http://localhost:3000/assets`);
-    if (!response.ok) throw new Error("No se pudo obtener el activo.");
-    const activos = await response.json();
-    asset.value = activos.find(a => a.trading_view_symbol === symbol);
+    const response = await axios.get("http://localhost:3000/assets");
+    asset.value = response.data.find(a => a.trading_view_symbol === symbol);
     if (!asset.value) throw new Error("Activo no encontrado.");
 
     // Si el usuario está logueado, comprobamos si tiene el activo en su portafolio
     await actualizarTieneActivo();
   } catch (e) {
-    error.value = e.message;
+    error.value = e.response?.data?.message || e.message;
   }
 });
 </script>

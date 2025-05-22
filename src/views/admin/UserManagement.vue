@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 
@@ -27,14 +28,10 @@ const searchText = ref("");
 // Función para obtener todos los usuarios
 async function obtenerUsuarios() {
     try {
-        const response = await fetch("http://localhost:3000/users"); // Cambia la URL si es necesario
-        if (!response.ok) {
-            throw new Error("Error al obtener los usuarios.");
-        }
-        usuarios.value = await response.json(); // Almacena los usuarios en el estado
-    } catch (err) {
-        error.value = err.message;
-        console.error(err);
+        const response = await axios.get("http://localhost:3000/users");
+        usuarios.value = response.data;
+    } catch (e) {
+        error.value = e.response?.data?.message || "Error al cargar los usuarios.";
     }
 }
 
@@ -64,30 +61,13 @@ async function guardarCambios() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/users/${usuarioSeleccionado.value.id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(usuarioSeleccionado.value),
-        });
-
-        if (!response.ok) {
-            throw new Error("Error al actualizar el usuario.");
-        }
-
-        // Actualizar la lista de usuarios localmente
-        const index = usuarios.value.findIndex((u) => u.id === usuarioSeleccionado.value.id);
-        if (index !== -1) {
-            usuarios.value[index] = { ...usuarioSeleccionado.value };
-        }
-
+        const response = await axios.put(`http://localhost:3000/users/${usuarioSeleccionado.value.id}`, usuarioSeleccionado.value);
+        await obtenerUsuarios();
         showEditModal.value = false; // Cerrar el modal de edición
         showSuccessEditModal.value = true; // Mostrar el modal de éxito
         error.value = ""; // Limpiar el mensaje de error
-    } catch (err) {
-        console.error(err);
-        error.value = "Error al guardar los cambios.";
+    } catch (e) {
+        error.value = e.response?.data?.message || "Error al guardar los cambios.";
         showEditModal.value = false; // Cerrar el modal de edición
         showErrorModal.value = true; // Mostrar el modal de error
     }
@@ -96,22 +76,12 @@ async function guardarCambios() {
 // Función para eliminar un usuario
 async function eliminarUsuario() {
     try {
-        const response = await fetch(`http://localhost:3000/users/${usuarioSeleccionado.value.id}`, {
-            method: "DELETE",
-        });
-
-        if (!response.ok) {
-            throw new Error("Error al eliminar el usuario.");
-        }
-
-        // Actualizar la lista de usuarios localmente
-        usuarios.value = usuarios.value.filter((u) => u.id !== usuarioSeleccionado.value.id);
-
+        await axios.delete(`http://localhost:3000/users/${usuarioSeleccionado.value.id}`);
+        await obtenerUsuarios();
         showDeleteModal.value = false; // Cerrar el modal de eliminación
         showSuccessDeleteModal.value = true; // Mostrar el modal de éxito
-    } catch (err) {
-        console.error(err);
-        error.value = "Error al eliminar el usuario.";
+    } catch (e) {
+        error.value = e.response?.data?.message || "Error al eliminar el usuario.";
         showDeleteModal.value = false; // Cerrar el modal de eliminación
         showErrorModal.value = true; // Mostrar el modal de error
     }

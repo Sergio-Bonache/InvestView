@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 
@@ -27,14 +28,10 @@ const searchText = ref("");
 // Función para obtener todos los activos
 async function obtenerActivos() {
     try {
-        const response = await fetch("http://localhost:3000/assets"); // Cambia la URL si es necesario
-        if (!response.ok) {
-            throw new Error("Error al obtener los activos.");
-        }
-        assets.value = await response.json(); // Almacena los activos en el estado
-    } catch (err) {
-        error.value = err.message;
-        console.error(err);
+        const response = await axios.get("http://localhost:3000/assets");
+        assets.value = response.data;
+    } catch (e) {
+        error.value = e.response?.data?.message || "Error al cargar los activos.";
     }
 }
 
@@ -87,30 +84,13 @@ async function guardarCambios() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/assets/${assetSeleccionado.value.id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(assetSeleccionado.value),
-        });
-
-        if (!response.ok) {
-            throw new Error("Error al actualizar el activo.");
-        }
-
-        // Actualizar la lista de activos localmente
-        const index = assets.value.findIndex((a) => a.id === assetSeleccionado.value.id);
-        if (index !== -1) {
-            assets.value[index] = { ...assetSeleccionado.value };
-        }
-
+        const response = await axios.put(`http://localhost:3000/assets/${assetSeleccionado.value.id}`, assetSeleccionado.value);
+        await obtenerActivos();
         showEditModal.value = false; // Cerrar el modal de edición
         showSuccessEditModal.value = true; // Mostrar el modal de éxito
         error.value = ""; // Limpiar el mensaje de error
-    } catch (err) {
-        console.error(err);
-        error.value = "Error al guardar los cambios.";
+    } catch (e) {
+        error.value = e.response?.data?.message || "Error al guardar los cambios.";
         showEditModal.value = false; // Cerrar el modal de edición
         showErrorModal.value = true; // Mostrar el modal de error
     }
@@ -119,22 +99,12 @@ async function guardarCambios() {
 // Función para eliminar un activo
 async function eliminarActivo() {
     try {
-        const response = await fetch(`http://localhost:3000/assets/${assetSeleccionado.value.id}`, {
-            method: "DELETE",
-        });
-
-        if (!response.ok) {
-            throw new Error("Error al eliminar el activo.");
-        }
-
-        // Actualizar la lista de activos localmente
-        assets.value = assets.value.filter((a) => a.id !== assetSeleccionado.value.id);
-
+        await axios.delete(`http://localhost:3000/assets/${assetSeleccionado.value.id}`);
+        await obtenerActivos();
         showDeleteModal.value = false; // Cerrar el modal de eliminación
         showSuccessDeleteModal.value = true; // Mostrar el modal de éxito
-    } catch (err) {
-        console.error(err);
-        error.value = "Error al eliminar el activo.";
+    } catch (e) {
+        error.value = e.response?.data?.message || "Error al eliminar el activo.";
         showDeleteModal.value = false; // Cerrar el modal de eliminación
         showErrorModal.value = true; // Mostrar el modal de error
     }

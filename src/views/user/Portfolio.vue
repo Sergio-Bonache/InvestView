@@ -1,158 +1,275 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 const sesion = ref(null);
 const portfolio = ref([]);
 const error = ref("");
+const allAssets = ref([]);
+const itemsPerPage = 7;
+const currentPage = ref(1);
+
+// Modal states
+const showAddModal = ref(false);
+const showSubtractModal = ref(false);
+const cantidad = ref(1);
+const addError = ref("");
+const subtractError = ref("");
+const selectedAsset = ref(null);
+
+// Computed property for paginated portfolio items
+const paginatedPortfolio = computed(() => {
+  const start = 0;
+  const end = currentPage.value * itemsPerPage;
+  return portfolio.value.slice(start, end);
+});
+
+// Computed property to check if there are more items to show
+const hasMoreItems = computed(() => {
+  return currentPage.value * itemsPerPage < portfolio.value.length;
+});
+
+function loadMore() {
+  currentPage.value++;
+}
+
+async function getAssetIdByName(assetName) {
+  try {
+    const response = await axios.get("http://localhost:3000/assets");
+    const asset = response.data.find(a => a.name === assetName);
+    if (!asset) throw new Error("Activo no encontrado.");
+    return asset.id;
+  } catch (e) {
+    console.error("Error al obtener el ID del activo:", e);
+    throw e;
+  }
+}
 
 onMounted(async () => {
   sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
-  if (!sesion.value) {
+  if (!sesion.value || sesion.value.role !== "client") {
     router.push("/login");
     return;
   }
   try {
-    // Suponiendo que tienes un endpoint que devuelve el portfolio del usuario con cantidad > 0
-    const response = await fetch(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
-    if (!response.ok) throw new Error("No se pudo obtener el portafolio.");
-    const data = await response.json();
-    // Filtra solo los activos con cantidad > 0
-    console.log(data);
-    portfolio.value = data;
+    const response = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
+    portfolio.value = response.data;
   } catch (e) {
     error.value = e.message;
   }
 });
 
 function anadir(activo) {
-  // Aquí puedes abrir un modal o redirigir a la vista de activo para añadir
-  router.push(`/assets/${activo.trading_view_symbol}`);
+  selectedAsset.value = activo;
+  cantidad.value = 1;
+  addError.value = "";
+  showAddModal.value = true;
 }
+
 function sustraer(activo) {
-  // Aquí puedes abrir un modal o redirigir a la vista de activo para sustraer
-  router.push(`/assets/${activo.trading_view_symbol}`);
+  selectedAsset.value = activo;
+  cantidad.value = 1;
+  subtractError.value = "";
+  showSubtractModal.value = true;
+}
+
+async function confirmarAnadir() {
+  addError.value = "";
+  if (!cantidad.value || cantidad.value <= 0.01) {
+    addError.value = "Introduce una cantidad mayor que 0,01€.";
+    return;
+  }
+  try {
+    const assetId = await getAssetIdByName(selectedAsset.value.name);
+    const response = await axios.post("http://localhost:3000/transactions/", {
+      user_id: sesion.value.id,
+      asset_id: assetId,
+      transaction_type: "compra",
+      quantity: cantidad.value,
+    });
+    
+    showAddModal.value = false;
+    // Refresh portfolio data
+    const response2 = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
+    portfolio.value = response2.data;
+  } catch (e) {
+    addError.value = e.response?.data?.message || "Error de red al añadir al portafolio.";
+  }
+}
+
+async function confirmarSustraer() {
+  subtractError.value = "";
+  if (!cantidad.value || cantidad.value <= 0.01 || cantidad.value > selectedAsset.value.total_quantity) {
+    if (cantidad.value > selectedAsset.value.total_quantity) {
+      subtractError.value = "No puedes sustraer más de lo que tienes.";
+    } else if (cantidad.value <= 0) {
+      subtractError.value = "Introduce una cantidad mayor que 0,01€.";
+    }
+    return;
+  }
+  try {
+    const assetId = await getAssetIdByName(selectedAsset.value.name);
+    const response = await axios.post("http://localhost:3000/transactions", {
+      user_id: sesion.value.id,
+      asset_id: assetId,
+      transaction_type: "venta",
+      quantity: cantidad.value,
+    });
+    
+    showSubtractModal.value = false;
+    // Refresh portfolio data
+    const response2 = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
+    portfolio.value = response2.data;
+  } catch (e) {
+    subtractError.value = e.response?.data?.message || "Error de red al sustraer del portafolio.";
+  }
 }
 </script>
 
 <template>
-  <section class="container mt-15 mb-15 px-4 mx-auto">
-    <h2 class="text-3xl font-medium text-gray-800 mb-8">Mi Portafolio</h2>
-    <div v-if="error" class="text-red-500 text-xl text-center py-10">{{ error }}</div>
-    <div v-else-if="portfolio.length === 0" class="text-gray-500 text-center py-10">
-      No tienes activos en tu portafolio.
+  <div class="flex flex-col mt-20 mb-20 w-7/10 mx-auto">
+    <!-- Empty Portfolio Card -->
+    <div v-if="portfolio.length === 0" class="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 my-20 w-2/3 mx-auto">
+      <div class="w-24 h-24 mb-6 text-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Tu portafolio está vacío</h2>
+      <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 text-center">
+        Comienza a construir tu portafolio de inversión añadiendo activos disponibles.
+      </p>
+      <RouterLink to="/assets" class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+        Explorar Activos
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 ml-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </RouterLink>
     </div>
-    <div v-else class="overflow-x-auto">
-      <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow">
-        <thead>
-          <tr class="bg-gray-100">
-            <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Activo</th>
-            <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Cantidad</th>
-            <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in portfolio" :key="item.asset_id" class="border-t">
-            <td class="px-6 py-4 flex items-center gap-4">
-              <img :src="item.logo_url" :alt="item.name" class="w-12 h-12 rounded-full object-cover border" />
-              <span class="font-medium text-gray-800">{{ item.name }}</span>
-            </td>
-            <td class="px-6 py-4 text-lg text-gray-700">{{ item.total_quantity.replace(".",",") }}€</td>
-            <td class="px-6 py-4 flex gap-2">
-              <button
-                @click="anadir(item)"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow transition"
-              >
-                Añadir
-              </button>
-              <button
-                @click="sustraer(item)"
-                class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md shadow transition"
-              >
-                Sustraer
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
 
-  <div class="flex flex-col mt-6">
-            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                    <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-800">
-                                <tr>
-                                    <th scope="col"
-                                        class="py-3.5 px-4 text-l font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/3">
-                                        <div class="flex items-center gap-x-3">
-                                            <span>Nombre</span>
-                                        </div>
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-3.5 text-l font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
-                                        <button class="flex items-center gap-x-2">
-                                            <span>Tipo</span>
-                                        </button>
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
-                                        Descripción
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
-                                        Opciones
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                                <tr v-for="item in portfolio" :key="item.asset_id" class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap w-1/4">
-                                        <div class="inline-flex items-center gap-x-3">
-                                            <div class="flex items-center gap-x-2">
-                                                <div>
-                                                    <h2 class="font-medium text-gray-800 dark:text-white">{{ item.name }}</h2>
-                                                    <p class="text-sm font-normal text-gray-600 dark:text-gray-400">
-                                                        {{ item.trading_view_symbol ? item.trading_view_symbol.split(":")[1].replace("EUR","") : '' }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap w-1/4">
-                                        {{ item.asset_type ? item.asset_type.charAt(0).toUpperCase() + item.asset_type.slice(1) : '' }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap w-1/4">
-                                        {{ item.description }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm whitespace-nowrap w-1/4">
-                                        <div class="flex items-center gap-x-6">
-                                            <button @click="anadir(item)"
-                                                class="text-gray-500 transition-colors duration-200 dark:hover:text-yellow-500 dark:text-gray-300 hover:text-yellow-500 focus:outline-none">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    stroke-width="1.7" stroke="currentColor" class="w-5 h-5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                                </svg>
-                                            </button>
-                                            <button @click="sustraer(item)"
-                                                class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    stroke-width="1.7" stroke="currentColor" class="w-5 h-5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+    <!-- Portfolio Table -->
+    <div v-else class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th scope="col"
+                  class="py-3.5 px-4 text-xl font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/3">
+                  <div class="flex items-center gap-x-3">
+                    <span>Nombre</span>
+                  </div>
+                </th>
+
+                <th scope="col"
+                  class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
+                  Descripción
+                </th>
+                <th scope="col"
+                  class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+              <tr v-for="item in paginatedPortfolio" :key="item.asset_id" class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap w-1/4">
+                  <div class="inline-flex items-center gap-x-3">
+                    <div class="flex items-center gap-x-2">
+                      <div class="flex items-center gap-3">
+                        <img :src="item.logo_url" class="w-15 h-15 rounded-full object-cover" />
+                        <h2 class="text-lg text-gray-800 dark:text-white">{{ item.name }}</h2>
+                      </div>
                     </div>
-                </div>
-            </div>
+                  </div>
+                </td>
+
+                <td class="px-4 py-4 text-lg text-gray-700 dark:text-gray-300 whitespace-nowrap w-1/4">
+                  {{ item.total_quantity.replace(".", ",") }}€
+                </td>
+                <td class="px-4 py-4 text-sm whitespace-nowrap w-1/4">
+                  <div class="flex items-center gap-x-6">
+                    <button @click="anadir(item)"
+                      class="text-gray-500 transition-colors duration-200 dark:hover:text-green-500 dark:text-gray-300 hover:text-green-500 focus:outline-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>
+
+                    </button>
+                    <button @click="sustraer(item)"
+                      class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                      </svg>
+
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Show more row -->
+              <tr v-if="hasMoreItems" class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" @click="loadMore">
+                <td colspan="3" class="px-4 py-4 text-center">
+                  <div class="flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700">
+                    <span class="text-lg font-medium">Mostrar más</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                      stroke="currentColor" class="w-6 h-6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal Añadir -->
+    <div v-if="showAddModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity">
+      <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Añadir a portafolio</h2>
+        <label class="block mb-2 text-xl font-semibold text-gray-700">Cantidad actual: {{ selectedAsset?.total_quantity }}€</label>
+        <input v-model.number="cantidad" type="number" min="1" placeholder="Cantidad a añadir en €"
+          class="w-full border border-gray-300 rounded-md text-lg px-4 py-2 mb-4" />
+        <div v-if="addError" class="text-red-600 text-m mb-2">{{ addError }}</div>
+        <div class="flex justify-end space-x-4">
+          <button @click="showAddModal = false"
+            class="w-1/2 px-4 py-2 text-gray-900 font-bold text-lg rounded-md hover:bg-gray-300">
+            Cancelar
+          </button>
+          <button @click="confirmarAnadir"
+            class="w-1/2 px-4 py-2 bg-blue-600 text-white text-xl rounded-md hover:bg-blue-700">
+            Añadir
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Sustraer -->
+    <div v-if="showSubtractModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity">
+      <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Sustraer de portafolio</h2>
+        <label class="block mb-2 text-xl font-semibold text-gray-700">Cantidad actual: {{ selectedAsset?.total_quantity }}€</label>
+        <input v-model.number="cantidad" type="number" min="1" placeholder="Cantidad a añadir en €"
+          class="w-full border border-gray-300 rounded-md text-lg px-4 py-2 mb-4" />
+        <div v-if="subtractError" class="text-red-600 text-m mb-2">{{ subtractError }}</div>
+        <div class="flex justify-end space-x-4">
+          <button @click="showSubtractModal = false"
+            class="w-1/2 px-4 py-2 text-gray-900 font-bold text-lg rounded-md hover:bg-gray-300">
+            Cancelar
+          </button>
+          <button @click="confirmarSustraer"
+            class="w-1/2 px-4 py-2 bg-red-600 text-white text-xl rounded-md hover:bg-red-700">
+            Sustraer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>

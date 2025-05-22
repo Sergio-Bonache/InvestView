@@ -2,6 +2,7 @@
 
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 
@@ -68,25 +69,15 @@ async function crearActivo() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/assets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form.value)
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || "Error al crear el activo.");
-    }
-
+    await axios.post("http://localhost:3000/assets", form.value);
     error.value = "";
     showSuccessEditModal.value = true;
     setTimeout(() => {
       showSuccessEditModal.value = false;
       router.push("/admin/assets");
     }, 1500);
-  } catch (err) {
-    error.value = err.message;
+  } catch (e) {
+    error.value = e.response?.data?.message || "Error al crear el activo.";
     showSuccessEditModal.value = false;
   }
 }
