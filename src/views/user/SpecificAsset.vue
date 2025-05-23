@@ -129,7 +129,7 @@ onMounted(async () => {
           <template v-if="!sesion">
             <router-link to="/login"
               class="w-19/20 bg-blue-600 hover:bg-blue-500 text-white text-center mt-2.5 py-3.5 rounded-md mt-auto font-semibold shadow block">
-              Loguéate para gestionar tu portafolio
+              Inicia sesión para gestionar tu portafolio
             </router-link>
           </template>
           <template v-else>

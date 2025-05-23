@@ -2,6 +2,7 @@
 import router from "@/router";
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
+import axios from "axios";
 
 const emit = defineEmits(["sesionIniciada"]);
 const form = ref({ email: "", password: "" });
@@ -14,23 +15,12 @@ async function iniciarSesion() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: form.value.email,
-        password: form.value.password,
-      }),
+    const response = await axios.post("http://localhost:3000/users/login", {
+      email: form.value.email,
+      password: form.value.password,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al iniciar sesión.");
-    }
-
-    const usuario = await response.json();
+    const usuario = response.data;
 
     // Emitir evento para actualizar la sesión
     emit("sesionIniciada", {
@@ -54,7 +44,7 @@ async function iniciarSesion() {
     error.value = "";
     router.push("/"); // Redirigir al inicio
   } catch (err) {
-    error.value = err.message;
+    error.value = err.response?.data?.message || "Error al iniciar sesión.";
     console.error(err);
   }
 }

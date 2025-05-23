@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
 const form = ref({ nombreUsuario: '', email: '', password: '', confirmPassword: '' });
@@ -40,23 +41,12 @@ async function registrarUsuario() {
   }
 
   try {
-    // Enviar datos al backend
-    const response = await fetch('http://localhost:3000/users/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: form.value.nombreUsuario,
-        email: form.value.email,
-        password: form.value.password,
-      }),
+    // Enviar datos al backend usando axios
+    await axios.post('http://localhost:3000/users/register', {
+      name: form.value.nombreUsuario,
+      email: form.value.email,
+      password: form.value.password,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al registrar el usuario.');
-    }
 
     // Si el registro es exitoso, mostrar el modal
     error.value = '';
@@ -68,7 +58,7 @@ async function registrarUsuario() {
       router.push('/login');
     }, 2000);
   } catch (err) {
-    error.value = err.message;
+    error.value = err.response?.data?.message || 'Error al registrar el usuario.';
     console.error(err);
   }
 }

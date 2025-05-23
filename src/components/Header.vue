@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink, useRouter } from 'vue-router'
+import { ref } from 'vue'
 
 const router = useRouter();
 const emit = defineEmits(["sesionCerrada"])
@@ -8,10 +9,17 @@ const props = defineProps({
   usuarioAutenticado: Object
 })
 
+const isMenuOpen = ref(false)
+
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value
+}
+
 function cerrarSesion() {
   emit("sesionCerrada", null)
   localStorage.removeItem("sesion")
   router.push("/")
+  isMenuOpen.value = false
 }
 </script>
 
@@ -31,7 +39,7 @@ function cerrarSesion() {
         </svg>
       </button>
 
-      <!-- Opciones del menú -->
+      <!-- Opciones del menú para desktop -->
       <div class="hidden lg:flex items-center justify-center flex-grow space-x-6">
         <!-- Opciones de navbar para usuarios sin registrar -->
         <RouterLink v-if="datosUsuario?.role != 'admin'" class="text-gray-700 hover:text-black-600" to="/assets">Activos Disponibles</RouterLink>
@@ -47,8 +55,8 @@ function cerrarSesion() {
           to="/admin/users">Gestionar Usuarios</RouterLink>
       </div>
 
-      <!-- Botones de login y signup si el usuario no está logueado -->
-      <div v-if="!usuarioAutenticado" class="flex items-center space-x-4">
+      <!-- Botones de login y signup si el usuario no está logueado (desktop) -->
+      <div v-if="!usuarioAutenticado" class="hidden lg:flex items-center space-x-4">
         <RouterLink to="/login">
           <button class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">Iniciar Sesión</button>
         </RouterLink>
@@ -59,8 +67,8 @@ function cerrarSesion() {
         </RouterLink>
       </div>
 
-      <!-- Opciones para usuarios autenticados -->
-      <div v-if="usuarioAutenticado" class="flex items-center space-x-4">
+      <!-- Opciones para usuarios autenticados (desktop) -->
+      <div v-if="usuarioAutenticado" class="hidden lg:flex items-center space-x-4">
         <span class="text-gray-700">
           Bienvenido, {{ usuarioAutenticado.name.charAt(0).toUpperCase() + usuarioAutenticado.name.slice(1) }}
           <span v-if="usuarioAutenticado.role === 'admin'"> ({{ usuarioAutenticado.role }})</span>
@@ -68,6 +76,42 @@ function cerrarSesion() {
         <button @click="cerrarSesion" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400">Cerrar Sesión</button>
       </div>
     </div>
-  </nav>
 
+    <!-- Menú móvil -->
+    <div v-if="isMenuOpen" class="lg:hidden bg-white shadow-lg">
+      <div class="px-4 py-2 space-y-2">
+        <!-- Opciones de navbar para usuarios sin registrar -->
+        <RouterLink v-if="datosUsuario?.role != 'admin'" @click="isMenuOpen = false" class="block py-2 text-gray-700 hover:text-black-600" to="/assets">Activos Disponibles</RouterLink>
+        <RouterLink v-if="datosUsuario?.role != 'admin'" @click="isMenuOpen = false" class="block py-2 text-gray-700 hover:text-black-600" to="/portfolio">Mi Portafolio</RouterLink>
+        <RouterLink v-if="datosUsuario?.role != 'admin'" @click="isMenuOpen = false" class="block py-2 text-gray-700 hover:text-black-600" to="/calculator/compound_interest">Calculadora de Interés Compuesto</RouterLink>
+        <RouterLink v-if="datosUsuario?.role != 'admin'" @click="isMenuOpen = false" class="block py-2 text-gray-700 hover:text-black-600" to="/calculator/mortgage">Calculadora de hipotecas</RouterLink>
+
+        <RouterLink v-if="datosUsuario?.role == 'admin'" @click="isMenuOpen = false" class="block py-2 text-gray-700 hover:text-black-600" to="/admin/assets/add">
+          Añadir Activo</RouterLink>
+        <RouterLink v-if="datosUsuario?.role == 'admin'" @click="isMenuOpen = false" class="block py-2 text-gray-700 hover:text-black-600" to="/admin/assets">
+          Gestionar Activos</RouterLink>
+        <RouterLink v-if="datosUsuario?.role == 'admin'" @click="isMenuOpen = false" class="block py-2 text-gray-700 hover:text-black-600"
+          to="/admin/users">Gestionar Usuarios</RouterLink>
+
+        <!-- Botones de login y signup si el usuario no está logueado (móvil) -->
+        <div v-if="!usuarioAutenticado" class="py-2 space-y-2">
+          <RouterLink to="/login" @click="isMenuOpen = false">
+            <button class="w-full bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">Iniciar Sesión</button>
+          </RouterLink>
+          <RouterLink to="/signup" @click="isMenuOpen = false">
+            <button class="w-full border border-gray-800 text-gray-800 px-4 py-2 rounded hover:bg-gray-800 hover:text-white">
+              Crear Cuenta
+            </button>
+          </RouterLink>
+        </div>
+
+        <!-- Opciones para usuarios autenticados (móvil) -->
+        <div v-if="usuarioAutenticado" class="py-2">
+          <button @click="cerrarSesion" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400">
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
 </template>

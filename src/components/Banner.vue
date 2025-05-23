@@ -10,7 +10,7 @@
           Organiza, analiza y optimiza tus inversiones en un solo lugar. Descubre herramientas diseñadas para ayudarte a
           alcanzar tus metas financieras.
         </p>
-        <router-link to="/miPortafolio"
+        <router-link to="/portfolio"
           class="inline-flex items-center justify-center px-12 py-3 mr-6 text-base font-medium text-center text-white text-lg bg-blue-600 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900">
           Comienza ahora ➤
         </router-link>

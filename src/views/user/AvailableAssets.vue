@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
 import axios from "axios";
 
 const activos = ref([]);

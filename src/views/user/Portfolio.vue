@@ -8,7 +8,7 @@ const sesion = ref(null);
 const portfolio = ref([]);
 const error = ref("");
 const allAssets = ref([]);
-const itemsPerPage = 7;
+const itemsPerPage = 5;
 const currentPage = ref(1);
 
 // Modal states

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
-import PieChart from '../components/PieChart.vue';
-import LineChart from '../components/LineChart.vue';
+import CompoundInterestPieChart from '../components/CompoundInterestPieChart.vue';
+import CompoundInterestLineChart from '../components/CompoundInterestLineChart.vue';
 
 const capitalInicial = ref(1000);
 const aportacion = ref(100);
@@ -129,14 +129,14 @@ const totalConInteresSerie = computed(() =>
       <!--Insertar pie chart aqui-->
       <div class="flex justify-center mt-12">
         <div class="w-1/2 flex justify-center">
-          <PieChart
+          <CompoundInterestPieChart
             :capital-inicial="capitalInicial"
             :intereses-ganados="interesesGanados"
             :aportaciones-posteriores="totalAportado - capitalInicial"
           />
         </div>
         <div class="w-1/2 flex justify-center">
-          <LineChart
+          <CompoundInterestLineChart
             :labels="labels"
             :aportaciones="aportacionesSerie"
             :totalConInteres="totalConInteresSerie"
