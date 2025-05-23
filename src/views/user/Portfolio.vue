@@ -178,10 +178,10 @@ async function confirmarSustraer() {
                 <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap w-1/4">
                   <div class="inline-flex items-center gap-x-3">
                     <div class="flex items-center gap-x-2">
-                      <div class="flex items-center gap-3">
+                      <RouterLink :to="`/assets/${item.trading_view_symbol}`" class="flex items-center gap-3 hover:opacity-80">
                         <img :src="item.logo_url" class="w-15 h-15 rounded-full object-cover" />
                         <h2 class="text-lg text-gray-800 dark:text-white">{{ item.name }}</h2>
-                      </div>
+                      </RouterLink>
                     </div>
                   </div>
                 </td>
