@@ -109,7 +109,7 @@ async function confirmarAnadir() {
     const response2 = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
     portfolio.value = response2.data;
   } catch (e) {
-    addError.value = e.response?.data?.message || "Error de red al añadir al portafolio.";
+    addError.value = e.response?.data?.message || "Error de red al añadir al portfolio.";
   }
 }
 
@@ -137,7 +137,7 @@ async function confirmarSustraer() {
     const response2 = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
     portfolio.value = response2.data;
   } catch (e) {
-    subtractError.value = e.response?.data?.message || "Error de red al sustraer del portafolio.";
+    subtractError.value = e.response?.data?.message || "Error de red al sustraer del portfolio.";
   }
 }
 </script>
@@ -151,9 +151,9 @@ async function confirmarSustraer() {
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
         </svg>
       </div>
-      <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu portafolio está vacío</h2>
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu portfolio está vacío</h2>
       <p class="text-lg text-gray-600 mb-8 text-center">
-        Comienza a construir tu portafolio de inversión añadiendo activos disponibles.
+        Comienza a construir tu portfolio de inversión añadiendo activos disponibles.
       </p>
       <RouterLink to="/assets" class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
         Explorar Activos
@@ -176,23 +176,23 @@ async function confirmarSustraer() {
       </div>
 
       <!-- Portfolio Table -->
-      <div class="overflow-hidden border border-gray-200 rounded-lg">
+      <div class="overflow-x-auto border border-gray-200 rounded-lg">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th scope="col"
-                class="py-3.5 px-4 text-xl font-semibold text-left rtl:text-right text-gray-700 w-1/3">
+                class="py-3.5 px-4 text-xl font-semibold text-left rtl:text-right text-gray-700">
                 <div class="flex items-center gap-x-3">
                   <span>Nombre</span>
                 </div>
               </th>
 
               <th scope="col"
-                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 w-1/4">
-                Descripción
+                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700">
+                Cantidad
               </th>
               <th scope="col"
-                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 w-1/4">
+                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700">
                 <div class="flex items-center justify-between">
                   <span>Acciones</span>
                   <div class="w-80">
@@ -217,37 +217,35 @@ async function confirmarSustraer() {
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="item in paginatedPortfolio" :key="item.asset_id" class="hover:bg-gray-50">
-              <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap w-1/4">
+              <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                 <div class="inline-flex items-center gap-x-3">
                   <div class="flex items-center gap-x-2">
                     <RouterLink :to="`/assets/${item.trading_view_symbol}`" class="flex items-center gap-3 hover:opacity-80">
-                      <img :src="item.logo_url" class="w-15 h-15 rounded-full object-cover" />
-                      <h2 class="text-lg text-gray-800">{{ item.name }}</h2>
+                      <img :src="item.logo_url" class="w-12 h-12 sm:w-15 sm:h-15 rounded-full object-cover" />
+                      <h2 class="text-base sm:text-lg text-gray-800">{{ item.name }}</h2>
                     </RouterLink>
                   </div>
                 </div>
               </td>
 
-              <td class="px-4 py-4 text-lg text-gray-700 whitespace-nowrap w-1/4">
+              <td class="px-4 py-4 text-base sm:text-lg text-gray-700 whitespace-nowrap">
                 {{ item.total_quantity.replace(".", ",") }}€
               </td>
-              <td class="px-4 py-4 text-sm whitespace-nowrap w-1/4">
+              <td class="px-4 py-4 text-sm whitespace-nowrap">
                 <div class="flex items-center gap-x-6">
                   <button @click="anadir(item)"
                     class="text-gray-500 transition-colors duration-200 hover:text-green-500 focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" class="size-7">
+                      stroke="currentColor" class="size-6 sm:size-7">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
-
                   </button>
                   <button @click="sustraer(item)"
                     class="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" class="size-7">
+                      stroke="currentColor" class="size-6 sm:size-7">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                     </svg>
-
                   </button>
                 </div>
               </td>
@@ -256,9 +254,9 @@ async function confirmarSustraer() {
             <tr v-if="hasMoreItems" class="hover:bg-gray-50 cursor-pointer" @click="loadMore">
               <td colspan="3" class="px-4 py-4 text-center">
                 <div class="flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700">
-                  <span class="text-lg font-medium">Mostrar más</span>
+                  <span class="text-base sm:text-lg font-medium">Mostrar más</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
+                    stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                   </svg>
                 </div>
@@ -273,7 +271,7 @@ async function confirmarSustraer() {
     <div v-if="showAddModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity">
       <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
-        <h2 class="text-2xl font-bold mb-4 text-gray-800">Añadir a portafolio</h2>
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Añadir a portfolio</h2>
         <label class="block mb-2 text-xl font-semibold text-gray-700">Cantidad actual: {{ selectedAsset?.total_quantity }}€</label>
         <input v-model.number="cantidad" type="number" min="1" placeholder="Cantidad a añadir en €"
           class="w-full border border-gray-300 rounded-md text-lg px-4 py-2 mb-4" />
@@ -295,7 +293,7 @@ async function confirmarSustraer() {
     <div v-if="showSubtractModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity">
       <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
-        <h2 class="text-2xl font-bold mb-4 text-gray-800">Sustraer de portafolio</h2>
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Sustraer de portfolio</h2>
         <label class="block mb-2 text-xl font-semibold text-gray-700">Cantidad actual: {{ selectedAsset?.total_quantity }}€</label>
         <input v-model.number="cantidad" type="number" min="1" placeholder="Cantidad a añadir en €"
           class="w-full border border-gray-300 rounded-md text-lg px-4 py-2 mb-4" />
