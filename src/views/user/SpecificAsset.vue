@@ -111,7 +111,7 @@ onMounted(async () => {
         <div class="flex items-center mt-5 mb-6">
           <img :src="asset.logo_url" :alt="asset.name"
             class="w-28 h-28 rounded-full object-cover border border-gray-300 mr-6" />
-          <h1 class="text-4xl font-semibold text-gray-800 dark:text-white">{{ asset.name }}</h1>
+          <h1 class="text-4xl font-semibold text-gray-800">{{ asset.name }}</h1>
         </div>
         <!-- Etiquetas debajo del título -->
         <div class="flex gap-2 mt-2 mb-4 w-full">
@@ -124,7 +124,7 @@ onMounted(async () => {
             {{ asset.trading_view_symbol }}
           </span>
         </div>
-        <p class="mt-4 text-lg text-gray-700 dark:text-gray-300">{{ asset.description }}</p>
+        <p class="mt-4 text-lg text-gray-700">{{ asset.description }}</p>
         <div class="mt-8 w-full">
           <template v-if="!sesion">
             <router-link to="/login"

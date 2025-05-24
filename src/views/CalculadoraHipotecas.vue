@@ -1,7 +1,19 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import MortgagePieChart from '../components/MortgagePieChart.vue';
 import MortgageLineChart from '../components/MortgageLineChart.vue';
+
+const router = useRouter();
+const sesion = ref(null);
+
+onMounted(() => {
+  sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
+  if (sesion.value && sesion.value.role === "admin") {
+    router.push("/");
+    return;
+  }
+});
 
 const precioVivienda = ref(300000);
 const entrada = ref(20);
@@ -203,17 +215,17 @@ const validaciones = computed(() => {
 
 <template>
   <section class="container mt-15 mb-15 px-4 mx-auto">
-    <h2 class="text-3xl font-medium text-gray-800 dark:text-white mb-6">Calculadora de Hipotecas</h2>
-    <p class="mb-8 text-gray-700 text-xl dark:text-gray-300">
+    <h2 class="text-3xl font-medium text-gray-800 mb-6">Calculadora de Hipotecas</h2>
+    <p class="mb-8 text-gray-700 text-xl">
       La <strong>calculadora de hipotecas</strong> te permite estimar las cuotas mensuales y el coste total de tu hipoteca, teniendo en cuenta el precio de la vivienda, la entrada, el plazo y el tipo de interés.
       <br><br>
       Para usarla, introduce el precio de la vivienda, el porcentaje de entrada (mínimo 20%), el plazo en años, el tipo de interés y el tipo de hipoteca que prefieres. La calculadora mostrará la cuota mensual, el total a pagar y los intereses generados.
     </p>
     
-    <form class="bg-gray-50 dark:bg-gray-900 rounded-lg shadow-md p-6 space-y-6 border border-gray-200 dark:border-gray-700">
+    <form class="bg-gray-50 rounded-lg shadow-md p-6 space-y-6 border border-gray-200">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="precioVivienda">
+          <label class="block text-gray-700 font-medium mb-2" for="precioVivienda">
             <span class="text-red-700 font-medium">*</span> Precio de la vivienda (€)
           </label>
           <input 
@@ -221,12 +233,12 @@ const validaciones = computed(() => {
             type="number" 
             min="0" 
             v-model.number="precioVivienda" 
-            class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" 
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" 
           />
         </div>
         
         <div>
-          <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="entrada">
+          <label class="block text-gray-700 font-medium mb-2" for="entrada">
             <span class="text-red-700 font-medium">*</span> Entrada (%)
           </label>
           <input 
@@ -235,18 +247,18 @@ const validaciones = computed(() => {
             min="20" 
             max="100" 
             v-model.number="entrada" 
-            class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" 
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" 
           />
         </div>
         
         <div>
-          <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="tipoHipoteca">
+          <label class="block text-gray-700 font-medium mb-2" for="tipoHipoteca">
             <span class="text-red-700 font-medium">*</span> Tipo de Hipoteca
           </label>
           <select 
             id="tipoHipoteca" 
             v-model="tipoHipoteca" 
-            class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none"
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none"
           >
             <option v-for="tipo in tiposHipoteca" :key="tipo.value" :value="tipo.value">
               {{ tipo.label }}
@@ -255,7 +267,7 @@ const validaciones = computed(() => {
         </div>
         
         <div v-if="tipoHipoteca === 'fijo'">
-          <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="tipoInteres">
+          <label class="block text-gray-700 font-medium mb-2" for="tipoInteres">
             <span class="text-red-700 font-medium">*</span> Tipo de interés fijo (%)
           </label>
           <input 
@@ -264,13 +276,13 @@ const validaciones = computed(() => {
             min="0" 
             step="0.01" 
             v-model.number="tipoInteres" 
-            class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" 
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" 
           />
         </div>
         
         <div v-if="tipoHipoteca === 'variable' || tipoHipoteca === 'mixto'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="euribor">
+            <label class="block text-gray-700 font-medium mb-2" for="euribor">
               <span class="text-red-700 font-medium">*</span> Euribor (%)
             </label>
             <input 
@@ -279,11 +291,11 @@ const validaciones = computed(() => {
               min="0" 
               step="0.01" 
               v-model.number="euribor" 
-              class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" 
+              class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" 
             />
           </div>
           <div>
-            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="diferencial">
+            <label class="block text-gray-700 font-medium mb-2" for="diferencial">
               <span class="text-red-700 font-medium">*</span> Diferencial (%)
             </label>
             <input 
@@ -292,13 +304,13 @@ const validaciones = computed(() => {
               min="0" 
               step="0.01" 
               v-model.number="diferencial" 
-              class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" 
+              class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" 
             />
           </div>
         </div>
         
         <div v-if="tipoHipoteca === 'mixto'" class="md:col-span-2">
-          <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="periodoFijo">
+          <label class="block text-gray-700 font-medium mb-2" for="periodoFijo">
             <span class="text-red-700 font-medium">*</span> Período de tipo fijo (años)
           </label>
           <input 
@@ -307,12 +319,12 @@ const validaciones = computed(() => {
             min="1" 
             :max="plazo - 1" 
             v-model.number="periodoFijo" 
-            class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" 
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" 
           />
         </div>
         
         <div class="md:col-span-2">
-          <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="plazo">
+          <label class="block text-gray-700 font-medium mb-2" for="plazo">
             <span class="text-red-700 font-medium">*</span> Plazo (años)
           </label>
           <input 
@@ -321,7 +333,7 @@ const validaciones = computed(() => {
             min="5" 
             max="40" 
             v-model.number="plazo" 
-            class="w-full rounded bg-white border-gray-300 dark:bg-gray-800 dark:text-white shadow-sm py-2 px-4 outline-none" 
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" 
           />
         </div>
       </div>
@@ -333,40 +345,40 @@ const validaciones = computed(() => {
       </div>
     </form>
 
-    <div class="mt-8 bg-gray-50 dark:bg-gray-800 shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-4">Resultados</h3>
+    <div class="mt-8 bg-gray-50 shadow-md rounded-lg p-6 border border-gray-200">
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">Resultados</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
         <div>
-          <div class="text-dark-500 dark:text-gray-400 text-xl">Cuota mensual</div>
+          <div class="text-dark-500 text-xl">Cuota mensual</div>
           <template v-if="tipoHipoteca === 'mixto'">
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+            <div class="text-2xl font-bold text-blue-600 mt-1">
               {{ cuotaMensual.cuotaFija.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <div class="text-sm text-gray-500 mt-1">
               Período fijo ({{ periodoFijo }} años)
             </div>
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
+            <div class="text-2xl font-bold text-blue-600 mt-2">
               {{ cuotaMensual.cuotaVariable.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <div class="text-sm text-gray-500 mt-1">
               Período variable ({{ plazo - periodoFijo }} años)
             </div>
           </template>
           <template v-else>
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+            <div class="text-2xl font-bold text-blue-600 mt-1">
               {{ cuotaMensual.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€
             </div>
           </template>
         </div>
         <div>
-          <div class="text-dark-500 dark:text-gray-400 text-xl">Intereses totales</div>
-          <div class="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
+          <div class="text-dark-500 text-xl">Intereses totales</div>
+          <div class="text-2xl font-bold text-red-600 mt-1">
             {{ interesesTotales.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€
           </div>
         </div>
         <div>
-          <div class="text-dark-500 dark:text-gray-400 text-xl">Total a pagar</div>
-          <div class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+          <div class="text-dark-500 text-xl">Total a pagar</div>
+          <div class="text-2xl font-bold text-gray-800 mt-1">
             {{ totalAPagar.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€
           </div>
         </div>
@@ -391,7 +403,7 @@ const validaciones = computed(() => {
       </div>
     </div>
 
-    <p class="mt-6 italic text-xl text-gray-500 dark:text-gray-400">
+    <p class="mt-6 italic text-xl text-gray-500">
       <span class="text-red-700 font-medium">*</span> El cálculo es orientativo y no tiene en cuenta otros gastos como comisiones, seguros, impuestos o notaría.
     </p>
   </section>

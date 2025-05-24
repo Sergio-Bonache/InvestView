@@ -70,7 +70,7 @@ function cerrarSesion() {
       <!-- Opciones para usuarios autenticados (desktop) -->
       <div v-if="usuarioAutenticado" class="hidden lg:flex items-center space-x-4">
         <span class="text-gray-700">
-          Bienvenido, {{ usuarioAutenticado.name.charAt(0).toUpperCase() + usuarioAutenticado.name.slice(1) }}
+          Bienvenido, {{ usuarioAutenticado.name.split(' ')[0].charAt(0).toUpperCase() + usuarioAutenticado.name.split(' ')[0].slice(1) }}
           <span v-if="usuarioAutenticado.role === 'admin'"> ({{ usuarioAutenticado.role }})</span>
         </span>
         <button @click="cerrarSesion" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400">Cerrar Sesión</button>

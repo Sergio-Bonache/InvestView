@@ -50,7 +50,7 @@ function cambiarPagina(pagina) {
 <template>
     <section class="container mt-15 mb-15 px-4 mx-auto">
         <div class="flex items-center -mb-9 justify-between gap-x-3">
-            <h2 class="text-3xl font-medium text-gray-800 dark:text-white">Activos Disponibles</h2>
+            <h2 class="text-3xl font-medium text-gray-800">Activos Disponibles</h2>
             <div class="w-80">
                 <label for="search" class="inline-flex items-center gap-x-2 w-full">
                     <span class="text-sm font-medium text-gray-700">
@@ -91,7 +91,7 @@ function cambiarPagina(pagina) {
         </div>
         <div class="flex items-center justify-between mt-9">
             <button @click="cambiarPagina(currentPage - 1)" :disabled="currentPage === 1"
-                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
@@ -100,13 +100,13 @@ function cambiarPagina(pagina) {
             </button>
             <div class="items-center hidden lg:flex gap-x-3">
                 <button v-for="page in totalPages" :key="page" @click="cambiarPagina(page)"
-                    :class="{ 'bg-blue-100/60 text-blue-500': currentPage === page, 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300': currentPage !== page }"
+                    :class="{ 'bg-blue-100/60 text-blue-500': currentPage === page, 'text-gray-500 hover:bg-gray-100': currentPage !== page }"
                     class="px-2 py-1 text-sm rounded-md">
                     {{ page }}
                 </button>
             </div>
             <button @click="cambiarPagina(currentPage + 1)" :disabled="currentPage === totalPages"
-                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100">
                 <span>Siguiente</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">

@@ -2,14 +2,16 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import PortfolioChart from '../../components/PortfolioChart.vue';
+import AssetTypeChart from '../../components/AssetTypeChart.vue';
 
 const router = useRouter();
 const sesion = ref(null);
 const portfolio = ref([]);
 const error = ref("");
-const allAssets = ref([]);
 const itemsPerPage = 5;
 const currentPage = ref(1);
+const searchText = ref("");
 
 // Modal states
 const showAddModal = ref(false);
@@ -21,14 +23,26 @@ const selectedAsset = ref(null);
 
 // Computed property for paginated portfolio items
 const paginatedPortfolio = computed(() => {
+  let filtrados = portfolio.value;
+  if (searchText.value.trim()) {
+    filtrados = portfolio.value.filter(item =>
+      item.name.toLowerCase().includes(searchText.value.trim().toLowerCase())
+    );
+  }
   const start = 0;
   const end = currentPage.value * itemsPerPage;
-  return portfolio.value.slice(start, end);
+  return filtrados.slice(start, end);
 });
 
 // Computed property to check if there are more items to show
 const hasMoreItems = computed(() => {
-  return currentPage.value * itemsPerPage < portfolio.value.length;
+  let filtrados = portfolio.value;
+  if (searchText.value.trim()) {
+    filtrados = portfolio.value.filter(item =>
+      item.name.toLowerCase().includes(searchText.value.trim().toLowerCase())
+    );
+  }
+  return currentPage.value * itemsPerPage < filtrados.length;
 });
 
 function loadMore() {
@@ -129,16 +143,16 @@ async function confirmarSustraer() {
 </script>
 
 <template>
-  <div class="flex flex-col mt-20 mb-20 w-7/10 mx-auto">
+  <div class="flex flex-col mt-20 mb-20 w-11/12 mx-auto">
     <!-- Empty Portfolio Card -->
-    <div v-if="portfolio.length === 0" class="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 my-20 w-2/3 mx-auto">
+    <div v-if="portfolio.length === 0" class="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-lg border border-gray-200 my-20 w-2/3 mx-auto">
       <div class="w-24 h-24 mb-6 text-blue-500">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
         </svg>
       </div>
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Tu portafolio está vacío</h2>
-      <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 text-center">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu portafolio está vacío</h2>
+      <p class="text-lg text-gray-600 mb-8 text-center">
         Comienza a construir tu portafolio de inversión añadiendo activos disponibles.
       </p>
       <RouterLink to="/assets" class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
@@ -149,82 +163,109 @@ async function confirmarSustraer() {
       </RouterLink>
     </div>
 
-    <!-- Portfolio Table -->
-    <div v-else class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-        <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th scope="col"
-                  class="py-3.5 px-4 text-xl font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/3">
-                  <div class="flex items-center gap-x-3">
-                    <span>Nombre</span>
-                  </div>
-                </th>
-
-                <th scope="col"
-                  class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
-                  Descripción
-                </th>
-                <th scope="col"
-                  class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-              <tr v-for="item in paginatedPortfolio" :key="item.asset_id" class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap w-1/4">
-                  <div class="inline-flex items-center gap-x-3">
-                    <div class="flex items-center gap-x-2">
-                      <RouterLink :to="`/assets/${item.trading_view_symbol}`" class="flex items-center gap-3 hover:opacity-80">
-                        <img :src="item.logo_url" class="w-15 h-15 rounded-full object-cover" />
-                        <h2 class="text-lg text-gray-800 dark:text-white">{{ item.name }}</h2>
-                      </RouterLink>
-                    </div>
-                  </div>
-                </td>
-
-                <td class="px-4 py-4 text-lg text-gray-700 dark:text-gray-300 whitespace-nowrap w-1/4">
-                  {{ item.total_quantity.replace(".", ",") }}€
-                </td>
-                <td class="px-4 py-4 text-sm whitespace-nowrap w-1/4">
-                  <div class="flex items-center gap-x-6">
-                    <button @click="anadir(item)"
-                      class="text-gray-500 transition-colors duration-200 dark:hover:text-green-500 dark:text-gray-300 hover:text-green-500 focus:outline-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-7">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                      </svg>
-
-                    </button>
-                    <button @click="sustraer(item)"
-                      class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-7">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
-                      </svg>
-
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <!-- Show more row -->
-              <tr v-if="hasMoreItems" class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" @click="loadMore">
-                <td colspan="3" class="px-4 py-4 text-center">
-                  <div class="flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700">
-                    <span class="text-lg font-medium">Mostrar más</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" class="w-6 h-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <!-- Portfolio Content -->
+    <div v-else class="space-y-8">
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-gray-100">
+        <div class="bg-gray-100 rounded-lg p-6">
+          <PortfolioChart :portfolio="portfolio" />
         </div>
+        <div class="bg-gray-100 rounded-lg p-6">
+          <AssetTypeChart :portfolio="portfolio" />
+        </div>
+      </div>
+
+      <!-- Portfolio Table -->
+      <div class="overflow-hidden border border-gray-200 rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col"
+                class="py-3.5 px-4 text-xl font-semibold text-left rtl:text-right text-gray-700 w-1/3">
+                <div class="flex items-center gap-x-3">
+                  <span>Nombre</span>
+                </div>
+              </th>
+
+              <th scope="col"
+                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 w-1/4">
+                Descripción
+              </th>
+              <th scope="col"
+                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700 w-1/4">
+                <div class="flex items-center justify-between">
+                  <span>Acciones</span>
+                  <div class="w-80">
+                    <label for="search" class="inline-flex items-center gap-x-2 w-full">
+                      <span class="text-sm font-medium text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                          stroke="currentColor" class="size-6.5">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                      </span>
+                      <div class="relative w-full">
+                        <input type="text" id="search" placeholder="Buscar Activo"
+                          class="mt-0.5 w-full rounded border-gray-300 shadow-lg shadow-gray-300/60 ring-1 ring-gray-200 sm:text-base py-2 outline-none pl-4 placeholder:italic placeholder:pl-0.5"
+                          v-model="searchText" />
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="item in paginatedPortfolio" :key="item.asset_id" class="hover:bg-gray-50">
+              <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap w-1/4">
+                <div class="inline-flex items-center gap-x-3">
+                  <div class="flex items-center gap-x-2">
+                    <RouterLink :to="`/assets/${item.trading_view_symbol}`" class="flex items-center gap-3 hover:opacity-80">
+                      <img :src="item.logo_url" class="w-15 h-15 rounded-full object-cover" />
+                      <h2 class="text-lg text-gray-800">{{ item.name }}</h2>
+                    </RouterLink>
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-4 py-4 text-lg text-gray-700 whitespace-nowrap w-1/4">
+                {{ item.total_quantity.replace(".", ",") }}€
+              </td>
+              <td class="px-4 py-4 text-sm whitespace-nowrap w-1/4">
+                <div class="flex items-center gap-x-6">
+                  <button @click="anadir(item)"
+                    class="text-gray-500 transition-colors duration-200 hover:text-green-500 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                      stroke="currentColor" class="size-7">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+
+                  </button>
+                  <button @click="sustraer(item)"
+                    class="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                      stroke="currentColor" class="size-7">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                    </svg>
+
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <!-- Show more row -->
+            <tr v-if="hasMoreItems" class="hover:bg-gray-50 cursor-pointer" @click="loadMore">
+              <td colspan="3" class="px-4 py-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700">
+                  <span class="text-lg font-medium">Mostrar más</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 

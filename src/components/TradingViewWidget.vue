@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch, ref } from "vue";
+import { onMounted } from "vue";
 
 const props = defineProps({
   symbol: {

@@ -85,24 +85,24 @@ async function crearActivo() {
 
 <template>
   <section class="container mt-15 mb-15 px-4 mx-auto max-w-2xl">
-    <h2 class="text-3xl font-medium text-gray-800 dark:text-white mb-8">Añadir Nuevo Activo</h2>
-    <form @submit.prevent="crearActivo" class="bg-gray-100 dark:bg-gray-900 rounded-lg shadow-md p-6 space-y-6 border border-gray-200 dark:border-gray-700">
+    <h2 class="text-3xl font-medium text-gray-800 mb-8">Añadir Nuevo Activo</h2>
+    <form @submit.prevent="crearActivo" class="bg-gray-100 rounded-lg shadow-md p-6 space-y-6 border border-gray-200">
       <div>
-        <label for="name" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Nombre del activo</label>
+        <label for="name" class="block text-gray-700 font-medium mb-2">Nombre del activo</label>
         <input
           id="name"
           v-model="form.name"
           type="text"
           placeholder="Ej: Apple Inc."
-          class="w-full rounded border-gray-300 bg-white dark:text-white shadow-sm py-2 px-4 outline-none"
+          class="w-full rounded border-gray-300 bg-white shadow-sm py-2 px-4 outline-none"
         />
       </div>
       <div>
-        <label for="asset_type" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Tipo de activo</label>
+        <label for="asset_type" class="block text-gray-700 font-medium mb-2">Tipo de activo</label>
         <select
           id="asset_type"
           v-model="form.asset_type"
-          class="w-full rounded border-gray-300 bg-white dark:text-white shadow-sm py-2 px-4 outline-none"
+          class="w-full rounded border-gray-300 bg-white shadow-sm py-2 px-4 outline-none"
         >
           <option value="" disabled>Selecciona un tipo</option>
           <option value="accion">Acción</option>
@@ -111,16 +111,16 @@ async function crearActivo() {
         </select>
       </div>
       <div>
-        <label for="description" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Descripción</label>
+        <label for="description" class="block text-gray-700 font-medium mb-2">Descripción</label>
         <textarea
           id="description"
           v-model="form.description"
           placeholder="Breve descripción del activo"
-          class="w-full rounded border-gray-300 bg-white dark:text-white shadow-sm py-2 px-4 outline-none"
+          class="w-full rounded border-gray-300 bg-white shadow-sm py-2 px-4 outline-none"
         ></textarea>
       </div>
       <div>
-        <label for="trading_view_symbol" class="block text-gray-700 dark:text-gray-300 font-medium mb-2 flex items-center gap-2">
+        <label for="trading_view_symbol" class="block text-gray-700 font-medium mb-2 flex items-center gap-2">
             Símbolo de TradingView
             <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer">
               <img
@@ -135,17 +135,17 @@ async function crearActivo() {
           v-model="form.trading_view_symbol"
           type="text"
           placeholder="Ej: NASDAQ:AAPL"
-          class="w-full rounded border-gray-300 bg-white dark:text-white shadow-sm py-2 px-4 outline-none"
+          class="w-full rounded border-gray-300 bg-white shadow-sm py-2 px-4 outline-none"
         />
       </div>
       <div>
-        <label for="logo_url" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">URL del logo</label>
+        <label for="logo_url" class="block text-gray-700 font-medium mb-2">URL del logo</label>
         <input
           id="logo_url"
           v-model="form.logo_url"
           type="text"
           placeholder="https://..."
-          class="w-full rounded border-gray-300 bg-white dark:text-white shadow-sm py-2 px-4 outline-none"
+          class="w-full rounded border-gray-300 bg-white shadow-sm py-2 px-4 outline-none"
         />
       </div>
       <div v-if="error" class="text-red-500 text-sm">{{ error }}</div>

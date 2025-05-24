@@ -1,135 +1,9 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import Banner from '../components/Banner.vue';
-import router from "@/router";
-
-let preguntas = [
-  {
-    id: "One",
-    titulo: "¿Qué es un free tour?",
-    respuesta: "Un free tour es una visita guiada en la que no se paga un precio fijo, sino que los participantes pueden dar una propina al guía al final del recorrido según lo que consideren adecuado. Es una opción popular para explorar una ciudad con guías locales expertos."
-  },
-  {
-    id: "Two",
-    titulo: "¿Cuánto dura un free tour?",
-    respuesta: "La duración de un free tour suele ser de entre 2 y 3 horas, dependiendo de la ciudad y el recorrido. Algunos tours pueden ser más cortos o más largos, pero en general, ofrecen una exploración básica de los puntos más importantes de la ciudad."
-  },
-  {
-    id: "Three",
-    titulo: "¿Quiénes son los guías?",
-    respuesta: "Los guías de un free tour suelen ser personas locales con conocimientos sobre la historia, cultura y los puntos turísticos de la ciudad. Pueden ser guías profesionales o aficionados apasionados por compartir su conocimiento con los turistas."
-  },
-  {
-    id: "Four",
-    titulo: "¿Cuánto cuesta hacer un free tour?",
-    respuesta: "El precio de un free tour es flexible, ya que no se cobra una tarifa fija. Al final del tour, los participantes pueden decidir cuánto quieren dar como propina al guía, dependiendo de su satisfacción con la experiencia."
-  },
-]
-
-const fecha = ref('');
-const fechaActual = new Date().toISOString().split('T')[0];
-const localidad = ref('');
-const localidades = ref([]);
-
-//Función para obtener las localidades de las rutas disponibles
-function obtenerLocalidadesRutas() {
-  fetch("http://localhost/freetours/api.php/rutas")
-    .then(response => response.json())
-    .then(data => {
-      localidades.value = data.filter(
-        (ruta) => ruta.fecha >= new Date().toISOString().split("T")[0] && ruta.guia_id != null
-      ).sort((a, b) => new Date(a.fecha) - new Date(b.fecha)).map(ruta => ruta.localidad);
-    })
-    .catch(error => {
-      console.error("Error al obtener rutas:", error);
-    });
-}
-
-//Función para buscar rutas disponibles en base a fecha y localidad del usuario
-function buscarRuta() {
-  router.push(`/rutasFiltradas/${fecha.value}/${localidad.value}`);
-}
-
-
-//Funciones para controlar el video
-
-function cambiarEstadoVideo() {
-  if (video.value) {
-    estaActivo.value = !video.value.paused;
-  }
-}
-
-function cambioPausarVer() {
-  if (video.value) {
-    if (video.value.paused) {
-      video.value.play();
-    } else {
-      video.value.pause();
-    }
-  }
-}
-
-function reiniciarVideo() {
-  if (video.value) {
-    video.value.currentTime = 0;
-    video.value.play();
-  }
-}
-
-function sumarSeg() {
-  if (video.value) {
-    video.value.currentTime += 5;
-  }
-}
-
-function restarSeg() {
-  if (video.value) {
-    video.value.currentTime -= 5;
-  }
-}
-
-function subirVol() {
-  if (video.value) {
-    video.value.volume = Math.min(video.value.volume + 0.1, 1);
-  }
-}
-
-function bajarVol() {
-  if (video.value) {
-    video.value.volume = Math.max(video.value.volume - 0.1, 0);
-  }
-}
-
-function cambiarSilenciado() {
-  if (video.value) {
-    video.value.muted = !video.value.muted;
-    estaSilenciado.value = video.value.muted;
-  }
-}
-
-const video = ref(null);
-const estaActivo = ref(false);
-const estaSilenciado = ref(false);
-
-onMounted(() => {
-  if (video.value) {
-    video.value.addEventListener('play', cambiarEstadoVideo);
-    video.value.addEventListener('pause', cambiarEstadoVideo);
-  }
-});
-
-onUnmounted(() => {
-  if (video.value) {
-    video.value.removeEventListener('play', cambiarEstadoVideo);
-    video.value.removeEventListener('pause', cambiarEstadoVideo);
-  }
-});
-
-onMounted(() => {
-  obtenerLocalidadesRutas();
-});
 
 </script>
+
 <template>
   <Banner />
   <!-- Contenidos en 3 bloques-->
@@ -158,7 +32,6 @@ onMounted(() => {
             <div class="flex-grow">
               <p class="leading-relaxed text-base">Registra y categoriza tus inversiones en un solo lugar para tener una
                 visión clara de tu portafolio.</p>
-
             </div>
           </div>
         </div>
@@ -198,12 +71,11 @@ onMounted(() => {
             <div class="flex-grow">
               <p class="leading-relaxed text-base">Utiliza nuestras herramientas para tomar decisiones informadas y
                 maximizar tus ganancias.</p>
-
             </div>
           </div>
         </div>
       </div>
-      <hr class="border-gray-200 my-8 dark:border-gray-700" />
+      <hr class="border-gray-200 my-8" />
     </div>
   </section>
   <!-- Calculadoras de inversión disponibles -->

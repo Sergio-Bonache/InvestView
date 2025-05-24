@@ -11,16 +11,16 @@ const rol = sesion ? JSON.parse(sesion).role : null;
 if (rol != "admin") {
   router.push("/");
 }
-const assets = ref([]); // Estado reactivo para almacenar los activos
-const error = ref(""); // Estado para manejar errores
-const showEditModal = ref(false); // Controla la visibilidad del modal de edición
-const showDeleteModal = ref(false); // Controla la visibilidad del modal de eliminación
-const showSuccessEditModal = ref(false); // Controla la visibilidad del modal de éxito al editar
-const showSuccessDeleteModal = ref(false); // Controla la visibilidad del modal de éxito al eliminar
-const showErrorModal = ref(false); // Controla la visibilidad del modal de error
-const assetSeleccionado = ref(null); // Almacena el activo seleccionado para editar o eliminar
-const currentPage = ref(1); // Página actual
-const itemsPerPage = 7; // Número de registros por página
+const assets = ref([]); 
+const error = ref(""); 
+const showEditModal = ref(false); 
+const showDeleteModal = ref(false); 
+const showSuccessEditModal = ref(false); 
+const showSuccessDeleteModal = ref(false); 
+const showErrorModal = ref(false); 
+const assetSeleccionado = ref(null); 
+const currentPage = ref(1); 
+const itemsPerPage = 7; 
 
 // Estado para el texto de búsqueda
 const searchText = ref("");
@@ -127,9 +127,8 @@ onMounted(() => {
     <section class="container mt-15 mb-15 px-4 mx-auto">
         <div class="flex items-center justify-between gap-x-3">
             <div class="flex items-center gap-x-3">
-                <h2 class="text-3xl font-medium text-gray-800 dark:text-white">Administrar Activos</h2>
-                <span
-                    class="px-2.5 py-0.5 mt-2 text-s text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400">
+                <h2 class="text-3xl font-medium text-gray-800">Administrar Activos</h2>
+                <span class="px-2.5 py-0.5 mt-2 text-s text-blue-600 bg-blue-100 rounded-full">
                     {{ assets.length }} activos
                 </span>
             </div>
@@ -146,7 +145,6 @@ onMounted(() => {
                         <input type="text" id="search" placeholder="Buscar Activo"
                             class="mt-0.5 w-full rounded border-gray-300 shadow-lg shadow-gray-300/60 ring-1 ring-gray-200 sm:text-base py-2 outline-none pl-4 placeholder:italic placeholder:pl-0.5"
                             v-model="searchText" />
-
                     </div>
                 </label>
             </div>
@@ -155,59 +153,50 @@ onMounted(() => {
         <div class="flex flex-col mt-6">
             <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                    <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-800">
+                    <div class="overflow-hidden border border-gray-200 md:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col"
-                                        class="py-3.5 px-4 text-l font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/3">
+                                    <th scope="col" class="py-3.5 px-4 text-l font-semibold text-left rtl:text-right text-gray-700 w-1/3">
                                         <div class="flex items-center gap-x-3">
                                             <span>Nombre</span>
                                         </div>
                                     </th>
-                                    <th scope="col"
-                                        class="px-4 py-3.5 text-l font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
+                                    <th scope="col" class="px-4 py-3.5 text-l font-semibold text-left rtl:text-right text-gray-700 w-1/4">
                                         <button class="flex items-center gap-x-2">
                                             <span>Tipo</span>
                                         </button>
                                     </th>
-                                    <th scope="col"
-                                        class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
+                                    <th scope="col" class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 w-1/4">
                                         Descripción
                                     </th>
-                                    <th scope="col"
-                                        class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 dark:text-gray-400 w-1/4">
+                                    <th scope="col" class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 w-1/4">
                                         Opciones
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                                <tr v-for="asset in assetsPaginados" :key="asset.id"
-                                    class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="asset in assetsPaginados" :key="asset.id" class="hover:bg-gray-50">
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap w-1/4">
                                         <div class="inline-flex items-center gap-x-3">
                                             <div class="flex items-center gap-x-2">
                                                 <div>
-                                                    <h2 class="font-medium text-gray-800 dark:text-white">{{
-                                                        asset.name }}</h2>
-                                                        <p class="text-sm font-normal text-gray-600 dark:text-gray-400">{{
-                                                        asset.trading_view_symbol.split(":")[1].replace("EUR","") }}</p>
+                                                    <h2 class="font-medium text-gray-800">{{ asset.name }}</h2>
+                                                    <p class="text-sm font-normal text-gray-600">{{ asset.trading_view_symbol.split(":")[1].replace("EUR","") }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap w-1/4">
+                                    <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap w-1/4">
                                         {{ asset.asset_type.charAt(0).toUpperCase() + asset.asset_type.slice(1) }}
                                     </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap w-1/4">
+                                    <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap w-1/4">
                                         {{ asset.description }}
                                     </td>
                                     <td class="px-4 py-4 text-sm whitespace-nowrap w-1/4">
                                         <div class="flex items-center gap-x-6">
                                             <button @click="abrirEditModal(asset)"
-                                                class="text-gray-500 transition-colors duration-200 dark:hover:text-yellow-500 dark:text-gray-300 hover:text-yellow-500 focus:outline-none">
+                                                class="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="1.7" stroke="currentColor" class="w-5 h-5">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -215,7 +204,7 @@ onMounted(() => {
                                                 </svg>
                                             </button>
                                             <button @click="abrirDeleteModal(asset)"
-                                                class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none">
+                                                class="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="1.7" stroke="currentColor" class="w-5 h-5">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -237,22 +226,19 @@ onMounted(() => {
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div
-                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                     <h3 class="text-xl font-semibold text-gray-900 mb-4">Editar Activo</h3>
                                     <div class="space-y-4">
                                         <div>
-                                            <label for="name"
-                                                class="block text-l font-medium text-gray-700">Nombre</label>
+                                            <label for="name" class="block text-l font-medium text-gray-700">Nombre</label>
                                             <input v-model="assetSeleccionado.name" type="text" id="name"
                                                 class="mt-1 block w-107 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
                                         </div>
                                         <div>
-                                            <label for="asset_type" class="block text-l font-medium text-gray-700">Tipo
-                                                de Activo</label>
+                                            <label for="asset_type" class="block text-l font-medium text-gray-700">Tipo de Activo</label>
                                             <select v-model="assetSeleccionado.asset_type" id="asset_type"
                                                 class="mt-1 block w-107 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                                 <option value="accion">Accion</option>
@@ -261,8 +247,7 @@ onMounted(() => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label for="description"
-                                                class="block text-l font-medium text-gray-700">Descripción</label>
+                                            <label for="description" class="block text-l font-medium text-gray-700">Descripción</label>
                                             <textarea v-model="assetSeleccionado.description" id="description"
                                                 class="mt-1 block w-107 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
                                         </div>
@@ -289,18 +274,14 @@ onMounted(() => {
         </div>
 
         <!-- Modal de éxito de edición -->
-        <div v-if="showSuccessEditModal" class="relative z-10" aria-labelledby="modal-title" role="alert"
-            aria-modal="true">
+        <div v-if="showSuccessEditModal" class="relative z-10" aria-labelledby="modal-title" role="alert" aria-modal="true">
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
-
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div
-                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
-                                <div
-                                    class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
+                                <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -340,13 +321,11 @@ onMounted(() => {
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div
-                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                    <h3 class="text-xl font-semibold text-gray-900 mb-4">¿Estás seguro de que deseas
-                                        eliminar a este activo?</h3>
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-4">¿Estás seguro de que deseas eliminar a este activo?</h3>
                                     <p class="text-s text-gray-500">Esta acción no se puede deshacer.</p>
                                     <div class="mt-6 mb-2 flex justify-end space-x-4">
                                         <button @click="showDeleteModal = false"
@@ -367,18 +346,14 @@ onMounted(() => {
         </div>
 
         <!-- Modal de éxito de eliminación -->
-        <div v-if="showSuccessDeleteModal" class="relative z-10" aria-labelledby="modal-title" role="alert"
-            aria-modal="true">
+        <div v-if="showSuccessDeleteModal" class="relative z-10" aria-labelledby="modal-title" role="alert" aria-modal="true">
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
-
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div
-                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
-                                <div
-                                    class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
+                                <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -416,15 +391,12 @@ onMounted(() => {
         <!-- Modal de error -->
         <div v-if="showErrorModal" class="relative z-10" aria-labelledby="modal-title" role="alert" aria-modal="true">
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
-
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div
-                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
-                                <div
-                                    class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-200 text-red-700 sm:mx-0 sm:size-10">
+                                <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-200 text-red-700 sm:mx-0 sm:size-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                         class="size-6">
                                         <path fill-rule="evenodd"
@@ -462,7 +434,7 @@ onMounted(() => {
 
         <div class="flex items-center justify-between mt-9">
             <button @click="cambiarPagina(currentPage - 1)" :disabled="currentPage === 1"
-                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
@@ -471,13 +443,13 @@ onMounted(() => {
             </button>
             <div class="items-center hidden lg:flex gap-x-3">
                 <button v-for="page in totalPages" :key="page" @click="cambiarPagina(page)"
-                    :class="{ 'bg-blue-100/60 text-blue-500': currentPage === page, 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300': currentPage !== page }"
+                    :class="{ 'bg-blue-100/60 text-blue-500': currentPage === page, 'text-gray-500 hover:bg-gray-100': currentPage !== page }"
                     class="px-2 py-1 text-sm rounded-md">
                     {{ page }}
                 </button>
             </div>
             <button @click="cambiarPagina(currentPage + 1)" :disabled="currentPage === totalPages"
-                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+                class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100">
                 <span>Siguiente</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">

@@ -43,9 +43,9 @@ const createChart = () => {
       datasets: [{
         data: [props.entrada, props.capitalPrestado, props.interesesTotales],
         backgroundColor: [
-          'rgba(0, 122, 255, 0.8)',    // Azul saturado para entrada
-          'rgba(52, 199, 89, 0.8)',    // Verde saturado para capital
-          'rgba(255, 59, 48, 0.8)'     // Rojo saturado para intereses
+          'rgba(0, 122, 255, 0.8)',    
+          'rgba(52, 199, 89, 0.8)',    
+          'rgba(255, 59, 48, 0.8)'     
         ],
         borderColor: [
           'rgba(0, 122, 255, 1)',
