@@ -16,7 +16,7 @@ watch(searchText, () => {
 
 onMounted(async () => {
     try {
-        const response = await axios.get("http://localhost:3000/assets");
+        const response = await axios.get("https://investviewback.onrender.com/assets");
         activos.value = response.data;
     } catch (e) {
         error.value = e.response?.data?.message || "Error al obtener los activos.";
