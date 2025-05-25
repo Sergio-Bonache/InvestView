@@ -35,7 +35,7 @@ async function confirmarAnadir() {
     return;
   }
   try {
-    await axios.post("http://localhost:3000/transactions/", {
+    await axios.post("https://investviewback.onrender.com/transactions/", {
       user_id: sesion.value.id,
       asset_id: asset.value.id,
       transaction_type: "compra",
@@ -59,7 +59,7 @@ async function confirmarSustraer() {
     return;
   }
   try {
-    await axios.post("http://localhost:3000/transactions", {
+    await axios.post("https://investviewback.onrender.com/transactions", {
       user_id: sesion.value.id,
       asset_id: asset.value.id,
       transaction_type: "venta",
@@ -76,7 +76,7 @@ async function confirmarSustraer() {
 async function actualizarTieneActivo() {
   if (sesion.value && asset.value) {
     try {
-      const response = await axios.get(`http://localhost:3000/transactions/user/${sesion.value.id}/asset/${asset.value.id}/quantity`);
+      const response = await axios.get(`https://investviewback.onrender.com/transactions/user/${sesion.value.id}/asset/${asset.value.id}/quantity`);
       tieneActivo.value = response.data.total_quantity > 0;
       total_quantity.value = response.data.total_quantity;
     } catch (e) {
@@ -90,7 +90,7 @@ onMounted(async () => {
   sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
   try {
     const symbol = route.params.ticker;
-    const response = await axios.get("http://localhost:3000/assets");
+    const response = await axios.get("https://investviewback.onrender.com/assets");
     asset.value = response.data.find(a => a.trading_view_symbol === symbol);
     if (!asset.value) throw new Error("Activo no encontrado.");
 

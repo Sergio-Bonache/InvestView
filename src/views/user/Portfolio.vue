@@ -51,7 +51,7 @@ function loadMore() {
 
 async function getAssetIdByName(assetName) {
   try {
-    const response = await axios.get("http://localhost:3000/assets");
+    const response = await axios.get("https://investviewback.onrender.com/assets");
     const asset = response.data.find(a => a.name === assetName);
     if (!asset) throw new Error("Activo no encontrado.");
     return asset.id;
@@ -68,7 +68,7 @@ onMounted(async () => {
     return;
   }
   try {
-    const response = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
+    const response = await axios.get(`https://investviewback.onrender.com/transactions/portfolio/${sesion.value.id}`);
     portfolio.value = response.data;
   } catch (e) {
     error.value = e.message;
@@ -97,7 +97,7 @@ async function confirmarAnadir() {
   }
   try {
     const assetId = await getAssetIdByName(selectedAsset.value.name);
-    const response = await axios.post("http://localhost:3000/transactions/", {
+    const response = await axios.post("https://investviewback.onrender.com/transactions/", {
       user_id: sesion.value.id,
       asset_id: assetId,
       transaction_type: "compra",
@@ -106,7 +106,7 @@ async function confirmarAnadir() {
     
     showAddModal.value = false;
     // Refresh portfolio data
-    const response2 = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
+    const response2 = await axios.get(`https://investviewback.onrender.com/transactions/portfolio/${sesion.value.id}`);
     portfolio.value = response2.data;
   } catch (e) {
     addError.value = e.response?.data?.message || "Error de red al añadir al portfolio.";
@@ -125,7 +125,7 @@ async function confirmarSustraer() {
   }
   try {
     const assetId = await getAssetIdByName(selectedAsset.value.name);
-    const response = await axios.post("http://localhost:3000/transactions", {
+    const response = await axios.post("https://investviewback.onrender.com/transactions", {
       user_id: sesion.value.id,
       asset_id: assetId,
       transaction_type: "venta",
@@ -134,7 +134,7 @@ async function confirmarSustraer() {
     
     showSubtractModal.value = false;
     // Refresh portfolio data
-    const response2 = await axios.get(`http://localhost:3000/transactions/portfolio/${sesion.value.id}`);
+    const response2 = await axios.get(`https://investviewback.onrender.com/transactions/portfolio/${sesion.value.id}`);
     portfolio.value = response2.data;
   } catch (e) {
     subtractError.value = e.response?.data?.message || "Error de red al sustraer del portfolio.";
