@@ -69,7 +69,7 @@ async function crearActivo() {
   }
 
   try {
-    await axios.post("http://localhost:3000/assets", form.value);
+    await axios.post("https://investviewback.onrender.com/assets", form.value);
     error.value = "";
     showSuccessEditModal.value = true;
     setTimeout(() => {

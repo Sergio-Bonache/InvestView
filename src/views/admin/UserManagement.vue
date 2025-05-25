@@ -27,7 +27,7 @@ const searchText = ref("");
 // Función para obtener todos los usuarios
 async function obtenerUsuarios() {
     try {
-        const response = await axios.get("http://localhost:3000/users");
+        const response = await axios.get("https://investviewback.onrender.com/users");
         usuarios.value = response.data;
     } catch (e) {
         error.value = e.response?.data?.message || "Error al cargar los usuarios.";
@@ -60,7 +60,7 @@ async function guardarCambios() {
     }
 
     try {
-        const response = await axios.put(`http://localhost:3000/users/${usuarioSeleccionado.value.id}`, usuarioSeleccionado.value);
+        const response = await axios.put(`https://investviewback.onrender.com/users/${usuarioSeleccionado.value.id}`, usuarioSeleccionado.value);
         await obtenerUsuarios();
         showEditModal.value = false; 
         showSuccessEditModal.value = true; 
@@ -75,7 +75,7 @@ async function guardarCambios() {
 // Función para eliminar un usuario
 async function eliminarUsuario() {
     try {
-        await axios.delete(`http://localhost:3000/users/${usuarioSeleccionado.value.id}`);
+        await axios.delete(`https://investviewback.onrender.com/users/${usuarioSeleccionado.value.id}`);
         await obtenerUsuarios();
         showDeleteModal.value = false; 
         showSuccessDeleteModal.value = true; 

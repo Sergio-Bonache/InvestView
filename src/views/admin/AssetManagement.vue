@@ -28,7 +28,7 @@ const searchText = ref("");
 // Función para obtener todos los activos
 async function obtenerActivos() {
     try {
-        const response = await axios.get("http://localhost:3000/assets");
+        const response = await axios.get("https://investviewback.onrender.com/assets");
         assets.value = response.data;
     } catch (e) {
         error.value = e.response?.data?.message || "Error al cargar los activos.";
@@ -84,7 +84,7 @@ async function guardarCambios() {
     }
 
     try {
-        const response = await axios.put(`http://localhost:3000/assets/${assetSeleccionado.value.id}`, assetSeleccionado.value);
+        const response = await axios.put(`https://investviewback.onrender.com/assets/${assetSeleccionado.value.id}`, assetSeleccionado.value);
         await obtenerActivos();
         showEditModal.value = false; // Cerrar el modal de edición
         showSuccessEditModal.value = true; // Mostrar el modal de éxito
@@ -99,7 +99,7 @@ async function guardarCambios() {
 // Función para eliminar un activo
 async function eliminarActivo() {
     try {
-        await axios.delete(`http://localhost:3000/assets/${assetSeleccionado.value.id}`);
+        await axios.delete(`https://investviewback.onrender.com/assets/${assetSeleccionado.value.id}`);
         await obtenerActivos();
         showDeleteModal.value = false; // Cerrar el modal de eliminación
         showSuccessDeleteModal.value = true; // Mostrar el modal de éxito

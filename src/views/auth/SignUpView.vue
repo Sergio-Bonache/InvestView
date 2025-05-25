@@ -42,7 +42,7 @@ async function registrarUsuario() {
 
   try {
     // Enviar datos al backend usando axios
-    await axios.post('http://localhost:3000/users/register', {
+    await axios.post('https://investviewback.onrender.com/users/register', {
       name: form.value.nombreUsuario,
       email: form.value.email,
       password: form.value.password,
