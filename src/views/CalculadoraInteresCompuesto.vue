@@ -150,18 +150,20 @@ const totalConInteresSerie = computed(() =>
             {maximumFractionDigits: 2}) }}€</div>
         </div>
       </div>
-      <div class="flex flex-col md:flex-row gap-12 mt-12">
-        <div class="flex-1 flex justify-center">
-          <div class="w-full md:w-4/5 lg:w-2/3">
-        <CompoundInterestPieChart :capital-inicial="capitalInicial" :intereses-ganados="interesesGanados"
-          :aportaciones-posteriores="totalAportado - capitalInicial" />
-          </div>
+      <div class="flex flex-col md:flex-row justify-center mt-12">
+        <div class="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
+          <CompoundInterestPieChart
+        :capital-inicial="capitalInicial"
+        :intereses-ganados="interesesGanados"
+        :aportaciones-posteriores="totalAportado - capitalInicial"
+          />
         </div>
-        <div class="flex-1 flex justify-center">
-          <div class="w-full md:w-4/5 lg:w-2/3">
-        <CompoundInterestLineChart :labels="labels" :aportaciones="aportacionesSerie"
-          :totalConInteres="totalConInteresSerie" />
-          </div>
+        <div class="w-full md:w-1/2 flex justify-center">
+          <CompoundInterestLineChart
+        :labels="labels"
+        :aportaciones="aportacionesSerie"
+        :totalConInteres="totalConInteresSerie"
+          />
         </div>
       </div>
     </div>
