@@ -6,8 +6,7 @@ import axios from 'axios';
 const router = useRouter();
 const form = ref({ nombreUsuario: '', email: '', password: '', confirmPassword: '' });
 const error = ref('');
-const showModal = ref(false); // Controla la visibilidad del modal
-
+const showModal = ref(false); 
 function validarPassword(password) {
   // Al menos 8 caracteres, una mayúscula y un símbolo
   return (

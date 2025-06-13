@@ -13,7 +13,7 @@ const itemsPerPage = 5;
 const currentPage = ref(1);
 const searchText = ref("");
 
-// Modal states
+// Estados de los modales
 const showAddModal = ref(false);
 const showSubtractModal = ref(false);
 const cantidad = ref(1);
@@ -21,7 +21,7 @@ const addError = ref("");
 const subtractError = ref("");
 const selectedAsset = ref(null);
 
-// Computed property for paginated portfolio items
+// Propiedad computada para los elementos paginados del portfolio
 const paginatedPortfolio = computed(() => {
   let filtrados = portfolio.value;
   if (searchText.value.trim()) {
@@ -34,7 +34,7 @@ const paginatedPortfolio = computed(() => {
   return filtrados.slice(start, end);
 });
 
-// Computed property to check if there are more items to show
+// Propiedad computada para comprobar si hay más elementos para mostrar
 const hasMoreItems = computed(() => {
   let filtrados = portfolio.value;
   if (searchText.value.trim()) {
@@ -62,7 +62,7 @@ async function getAssetIdByName(assetName) {
 }
 
 onMounted(async () => {
-  sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
+  sesion.value = sessionStorage.getItem("sesion") ? JSON.parse(sessionStorage.getItem("sesion")) : null;
   if (!sesion.value || sesion.value.role !== "client") {
     router.push("/login");
     return;
@@ -105,7 +105,6 @@ async function confirmarAnadir() {
     });
     
     showAddModal.value = false;
-    // Refresh portfolio data
     const response2 = await axios.get(`https://investviewback.onrender.com/transactions/portfolio/${sesion.value.id}`);
     portfolio.value = response2.data;
   } catch (e) {
@@ -133,7 +132,6 @@ async function confirmarSustraer() {
     });
     
     showSubtractModal.value = false;
-    // Refresh portfolio data
     const response2 = await axios.get(`https://investviewback.onrender.com/transactions/portfolio/${sesion.value.id}`);
     portfolio.value = response2.data;
   } catch (e) {
@@ -163,9 +161,9 @@ async function confirmarSustraer() {
       </RouterLink>
     </div>
 
-    <!-- Portfolio Content -->
+    <!-- Portfolio -->
     <div v-else class="space-y-8">
-      <!-- Charts Section -->
+      <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-gray-100">
         <div class="bg-gray-100 rounded-lg p-6">
           <PortfolioChart :portfolio="portfolio" />
@@ -175,27 +173,26 @@ async function confirmarSustraer() {
         </div>
       </div>
 
-      <!-- Portfolio Table -->
+      <!-- Tabla de Portfolio -->
       <div class="overflow-x-auto border border-gray-200 rounded-lg">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th scope="col"
-                class="py-3.5 px-4 text-xl font-semibold text-left rtl:text-right text-gray-700">
+                class="w-1/3 py-3.5 px-4 text-xl font-semibold text-left rtl:text-right text-gray-700">
                 <div class="flex items-center gap-x-3">
                   <span>Nombre</span>
                 </div>
               </th>
 
               <th scope="col"
-                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700">
+                class="w-1/3 px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700">
                 Cantidad
               </th>
               <th scope="col"
-                class="px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700">
+                class="w-1/3 px-4 py-3.5 text-xl font-semibold text-left rtl:text-right text-gray-700">
                 <div class="flex items-center justify-between">
-                  <span>Acciones</span>
-                  <div class="w-80">
+                  <div class="w-full">
                     <label for="search" class="inline-flex items-center gap-x-2 w-full">
                       <span class="text-sm font-medium text-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -250,7 +247,6 @@ async function confirmarSustraer() {
                 </div>
               </td>
             </tr>
-            <!-- Show more row -->
             <tr v-if="hasMoreItems" class="hover:bg-gray-50 cursor-pointer" @click="loadMore">
               <td colspan="3" class="px-4 py-4 text-center">
                 <div class="flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700">

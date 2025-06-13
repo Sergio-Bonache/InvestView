@@ -20,29 +20,21 @@ async function iniciarSesion() {
       password: form.value.password,
     });
 
-    const usuario = response.data;
+    const sesion = {
+      name: response.data.name,
+      email: response.data.email,
+      role: response.data.role,
+      id: response.data.id,
+      token: response.data.token
+    };
+    sessionStorage.setItem("sesion", JSON.stringify(sesion));
 
-    // Emitir evento para actualizar la sesión
-    emit("sesionIniciada", {
-      name: usuario.name,
-      email: usuario.email,
-      role: usuario.role,
-      id: usuario.id,
-    });
+    axios.defaults.headers.common["Authorization"] = `Bearer ${sesion.token}`;
 
-    // Guardar la sesión en localStorage
-    localStorage.setItem(
-      "sesion",
-      JSON.stringify({
-        name: usuario.name,
-        email: usuario.email,
-        role: usuario.role,
-        id: usuario.id
-      })
-    );
+    emit("sesionIniciada", sesion);
 
     error.value = "";
-    router.push("/"); // Redirigir al inicio
+    router.push("/"); 
   } catch (err) {
     error.value = err.response?.data?.message || "Error al iniciar sesión.";
     console.error(err);

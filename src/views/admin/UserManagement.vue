@@ -5,12 +5,28 @@ import axios from "axios";
 
 const router = useRouter();
 
-const sesion = localStorage.getItem("sesion");
-const rol = sesion ? JSON.parse(sesion).role : null;
+onMounted(() => {
+    let sesion;
+    try {
+        sesion = JSON.parse(sessionStorage.getItem("sesion"));
+    } catch (e) {
+        sessionStorage.removeItem("sesion");
+        router.push("/login");
+        return;
+    }
+    
+    // Si no hay sesión o no es admin, redirige al login
+    if (!sesion || sesion.role !== "admin") {
+        sessionStorage.removeItem("sesion");
+        router.push("/login");
+        return;
+    }
 
-if (rol != "admin") {
-  router.push("/");
-}
+    // Establece el header de autorización por defecto para todas las peticiones
+    axios.defaults.headers.common["Authorization"] = `Bearer ${sesion.token}`;
+    obtenerUsuarios();
+});
+
 const usuarios = ref([]); 
 const error = ref(""); 
 const showEditModal = ref(false); 
@@ -30,7 +46,12 @@ async function obtenerUsuarios() {
         const response = await axios.get("https://investviewback.onrender.com/users");
         usuarios.value = response.data;
     } catch (e) {
-        error.value = e.response?.data?.message || "Error al cargar los usuarios.";
+        if (e.response?.status === 401 || e.response?.status === 403) {
+            sessionStorage.removeItem("sesion");
+            router.push("/login");
+        } else {
+            error.value = e.response?.data?.message || "Error al cargar los usuarios.";
+        }
     }
 }
 
@@ -66,9 +87,14 @@ async function guardarCambios() {
         showSuccessEditModal.value = true; 
         error.value = ""; 
     } catch (e) {
-        error.value = e.response?.data?.message || "Error al guardar los cambios.";
-        showEditModal.value = false; 
-        showErrorModal.value = true; 
+        if (e.response?.status === 401 || e.response?.status === 403) {
+            sessionStorage.removeItem("sesion");
+            router.push("/login");
+        } else {
+            error.value = e.response?.data?.message || "Error al guardar los cambios.";
+            showEditModal.value = false; 
+            showErrorModal.value = true; 
+        }
     }
 }
 
@@ -80,13 +106,18 @@ async function eliminarUsuario() {
         showDeleteModal.value = false; 
         showSuccessDeleteModal.value = true; 
     } catch (e) {
-        error.value = e.response?.data?.message || "Error al eliminar el usuario.";
-        showDeleteModal.value = false; 
-        showErrorModal.value = true; 
+        if (e.response?.status === 401 || e.response?.status === 403) {
+            sessionStorage.removeItem("sesion");
+            router.push("/login");
+        } else {
+            error.value = e.response?.data?.message || "Error al eliminar el usuario.";
+            showDeleteModal.value = false; 
+            showErrorModal.value = true; 
+        }
     }
 }
 
-// MODIFICADO: Computed para paginar y filtrar los usuarios
+// Computed para paginar y filtrar los usuarios
 const usuariosPaginados = computed(() => {
     let filtrados = usuarios.value;
     if (searchText.value.trim()) {
@@ -99,7 +130,7 @@ const usuariosPaginados = computed(() => {
     return filtrados.slice(start, end);
 });
 
-// MODIFICADO: Total de páginas según filtrado
+// Total de páginas según filtrado
 const totalPages = computed(() => {
     let filtrados = usuarios.value;
     if (searchText.value.trim()) {
@@ -116,11 +147,6 @@ function cambiarPagina(pagina) {
         currentPage.value = pagina;
     }
 }
-
-// Llama a la función al montar el componente
-onMounted(() => {
-    obtenerUsuarios();
-});
 </script>
 
 <template>

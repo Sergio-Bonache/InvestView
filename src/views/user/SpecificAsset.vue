@@ -87,7 +87,7 @@ async function actualizarTieneActivo() {
 }
 
 onMounted(async () => {
-  sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
+  sesion.value = sessionStorage.getItem("sesion") ? JSON.parse(sessionStorage.getItem("sesion")) : null;
   try {
     const symbol = route.params.ticker;
     const response = await axios.get("https://investviewback.onrender.com/assets");

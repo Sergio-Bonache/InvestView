@@ -5,22 +5,40 @@ import axios from "axios";
 
 const router = useRouter();
 
-const sesion = localStorage.getItem("sesion");
-const rol = sesion ? JSON.parse(sesion).role : null;
+onMounted(() => {
+    let sesion;
+    try {
+        sesion = JSON.parse(sessionStorage.getItem("sesion"));
+    } catch (e) {
+        sessionStorage.removeItem("sesion");
+        router.push("/login");
+        return;
+    }
 
-if (rol != "admin") {
-  router.push("/");
-}
-const assets = ref([]); 
-const error = ref(""); 
-const showEditModal = ref(false); 
-const showDeleteModal = ref(false); 
-const showSuccessEditModal = ref(false); 
-const showSuccessDeleteModal = ref(false); 
-const showErrorModal = ref(false); 
-const assetSeleccionado = ref(null); 
-const currentPage = ref(1); 
-const itemsPerPage = 7; 
+    // Si no hay sesión o no es admin, redirigir a login
+    if (!sesion || sesion.role !== "admin") {
+        sessionStorage.removeItem("sesion");
+        router.push("/login");
+        return;
+    }
+
+    // Establecer el header de autorización para todas las peticiones
+    axios.defaults.headers.common["Authorization"] = `Bearer ${sesion.token}`;
+
+    // Cargar activos después de configurar autenticación
+    obtenerActivos();
+});
+
+const assets = ref([]);
+const error = ref("");
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const showSuccessEditModal = ref(false);
+const showSuccessDeleteModal = ref(false);
+const showErrorModal = ref(false);
+const assetSeleccionado = ref(null);
+const currentPage = ref(1);
+const itemsPerPage = 7;
 
 // Estado para el texto de búsqueda
 const searchText = ref("");
@@ -31,7 +49,12 @@ async function obtenerActivos() {
         const response = await axios.get("https://investviewback.onrender.com/assets");
         assets.value = response.data;
     } catch (e) {
-        error.value = e.response?.data?.message || "Error al cargar los activos.";
+        if (e.response?.status === 401 || e.response?.status === 403) {
+            sessionStorage.removeItem("sesion");
+            router.push("/login");
+        } else {
+            error.value = e.response?.data?.message || "Error al cargar los activos.";
+        }
     }
 }
 
@@ -61,13 +84,13 @@ const totalPages = computed(() => {
 
 // Función para abrir el modal de edición
 function abrirEditModal(asset) {
-    assetSeleccionado.value = { ...asset }; // Clonar el activo seleccionado
+    assetSeleccionado.value = { ...asset };
     showEditModal.value = true;
 }
 
 // Función para abrir el modal de confirmación de eliminación
 function abrirDeleteModal(asset) {
-    assetSeleccionado.value = { ...asset }; // Clonar el activo seleccionado
+    assetSeleccionado.value = { ...asset };
     showDeleteModal.value = true;
 }
 
@@ -86,13 +109,18 @@ async function guardarCambios() {
     try {
         const response = await axios.put(`https://investviewback.onrender.com/assets/${assetSeleccionado.value.id}`, assetSeleccionado.value);
         await obtenerActivos();
-        showEditModal.value = false; // Cerrar el modal de edición
-        showSuccessEditModal.value = true; // Mostrar el modal de éxito
-        error.value = ""; // Limpiar el mensaje de error
+        showEditModal.value = false;
+        showSuccessEditModal.value = true;
+        error.value = "";
     } catch (e) {
-        error.value = e.response?.data?.message || "Error al guardar los cambios.";
-        showEditModal.value = false; // Cerrar el modal de edición
-        showErrorModal.value = true; // Mostrar el modal de error
+        if (e.response?.status === 401 || e.response?.status === 403) {
+            sessionStorage.removeItem("sesion");
+            router.push("/login");
+        } else {
+            error.value = e.response?.data?.message || "Error al guardar los cambios.";
+            showEditModal.value = false;
+            showErrorModal.value = true;
+        }
     }
 }
 
@@ -101,12 +129,17 @@ async function eliminarActivo() {
     try {
         await axios.delete(`https://investviewback.onrender.com/assets/${assetSeleccionado.value.id}`);
         await obtenerActivos();
-        showDeleteModal.value = false; // Cerrar el modal de eliminación
-        showSuccessDeleteModal.value = true; // Mostrar el modal de éxito
+        showDeleteModal.value = false;
+        showSuccessDeleteModal.value = true;
     } catch (e) {
-        error.value = e.response?.data?.message || "Error al eliminar el activo.";
-        showDeleteModal.value = false; // Cerrar el modal de eliminación
-        showErrorModal.value = true; // Mostrar el modal de error
+        if (e.response?.status === 401 || e.response?.status === 403) {
+            sessionStorage.removeItem("sesion");
+            router.push("/login");
+        } else {
+            error.value = e.response?.data?.message || "Error al eliminar el activo.";
+            showDeleteModal.value = false;
+            showErrorModal.value = true;
+        }
     }
 }
 
@@ -116,11 +149,6 @@ function cambiarPagina(pagina) {
         currentPage.value = pagina;
     }
 }
-
-// Llama a la función al montar el componente
-onMounted(() => {
-    obtenerActivos();
-});
 </script>
 
 <template>
@@ -157,20 +185,24 @@ onMounted(() => {
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="py-3.5 px-4 text-l font-semibold text-left rtl:text-right text-gray-700 w-1/3">
+                                    <th scope="col"
+                                        class="py-3.5 px-4 text-l font-semibold text-left rtl:text-right text-gray-700 w-1/3">
                                         <div class="flex items-center gap-x-3">
                                             <span>Nombre</span>
                                         </div>
                                     </th>
-                                    <th scope="col" class="px-4 py-3.5 text-l font-semibold text-left rtl:text-right text-gray-700 w-1/4">
+                                    <th scope="col"
+                                        class="px-4 py-3.5 text-l font-semibold text-left rtl:text-right text-gray-700 w-1/4">
                                         <button class="flex items-center gap-x-2">
                                             <span>Tipo</span>
                                         </button>
                                     </th>
-                                    <th scope="col" class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 w-1/4">
+                                    <th scope="col"
+                                        class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 w-1/4">
                                         Descripción
                                     </th>
-                                    <th scope="col" class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 w-1/4">
+                                    <th scope="col"
+                                        class="px-4 py-3.5 text font-semibold text-left rtl:text-right text-gray-700 w-1/4">
                                         Opciones
                                     </th>
                                 </tr>
@@ -182,7 +214,8 @@ onMounted(() => {
                                             <div class="flex items-center gap-x-2">
                                                 <div>
                                                     <h2 class="font-medium text-gray-800">{{ asset.name }}</h2>
-                                                    <p class="text-sm font-normal text-gray-600">{{ asset.trading_view_symbol.split(":")[1].replace("EUR","") }}</p>
+                                                    <p class="text-sm font-normal text-gray-600">{{
+                                                        asset.trading_view_symbol.split(":")[1].replace("EUR","") }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -226,19 +259,22 @@ onMounted(() => {
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div
+                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                     <h3 class="text-xl font-semibold text-gray-900 mb-4">Editar Activo</h3>
                                     <div class="space-y-4">
                                         <div>
-                                            <label for="name" class="block text-l font-medium text-gray-700">Nombre</label>
+                                            <label for="name"
+                                                class="block text-l font-medium text-gray-700">Nombre</label>
                                             <input v-model="assetSeleccionado.name" type="text" id="name"
                                                 class="mt-1 block w-107 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
                                         </div>
                                         <div>
-                                            <label for="asset_type" class="block text-l font-medium text-gray-700">Tipo de Activo</label>
+                                            <label for="asset_type" class="block text-l font-medium text-gray-700">Tipo
+                                                de Activo</label>
                                             <select v-model="assetSeleccionado.asset_type" id="asset_type"
                                                 class="mt-1 block w-107 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                                 <option value="accion">Accion</option>
@@ -247,7 +283,8 @@ onMounted(() => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label for="description" class="block text-l font-medium text-gray-700">Descripción</label>
+                                            <label for="description"
+                                                class="block text-l font-medium text-gray-700">Descripción</label>
                                             <textarea v-model="assetSeleccionado.description" id="description"
                                                 class="mt-1 block w-107 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
                                         </div>
@@ -274,14 +311,17 @@ onMounted(() => {
         </div>
 
         <!-- Modal de éxito de edición -->
-        <div v-if="showSuccessEditModal" class="relative z-10" aria-labelledby="modal-title" role="alert" aria-modal="true">
+        <div v-if="showSuccessEditModal" class="relative z-10" aria-labelledby="modal-title" role="alert"
+            aria-modal="true">
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div
+                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
-                                <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
+                                <div
+                                    class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -316,16 +356,18 @@ onMounted(() => {
             </div>
         </div>
 
-        <!-- Modal de confirmación de eliminación -->        
+        <!-- Modal de confirmación de eliminación -->
         <div v-if="showDeleteModal" class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div
+                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                    <h3 class="text-xl font-semibold text-gray-900 mb-4">¿Estás seguro de que deseas eliminar a este activo?</h3>
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-4">¿Estás seguro de que deseas
+                                        eliminar a este activo?</h3>
                                     <p class="text-s text-gray-500">Esta acción no se puede deshacer.</p>
                                     <div class="mt-6 mb-2 flex justify-end space-x-4">
                                         <button @click="showDeleteModal = false"
@@ -346,14 +388,17 @@ onMounted(() => {
         </div>
 
         <!-- Modal de éxito de eliminación -->
-        <div v-if="showSuccessDeleteModal" class="relative z-10" aria-labelledby="modal-title" role="alert" aria-modal="true">
+        <div v-if="showSuccessDeleteModal" class="relative z-10" aria-labelledby="modal-title" role="alert"
+            aria-modal="true">
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div
+                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
-                                <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
+                                <div
+                                    class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -393,10 +438,12 @@ onMounted(() => {
             <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
+                    <div
+                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:max-h-[90vh]">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex pt-2 sm:items-start">
-                                <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-200 text-red-700 sm:mx-0 sm:size-10">
+                                <div
+                                    class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-200 text-red-700 sm:mx-0 sm:size-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                         class="size-6">
                                         <path fill-rule="evenodd"

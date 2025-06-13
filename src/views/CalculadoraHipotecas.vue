@@ -8,7 +8,7 @@ const router = useRouter();
 const sesion = ref(null);
 
 onMounted(() => {
-  sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
+  sesion.value = sessionStorage.getItem("sesion") ? JSON.parse(sessionStorage.getItem("sesion")) : null;
   if (sesion.value && sesion.value.role === "admin") {
     router.push("/");
     return;
@@ -384,20 +384,20 @@ const validaciones = computed(() => {
         </div>
       </div>
 
-      <div class="flex justify-center mt-12">
-        <div class="w-1/2 flex justify-center">
+      <div class="flex flex-col md:flex-row justify-center mt-12 gap-8">
+        <div class="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
           <MortgagePieChart
-            :capital-prestado="capitalPrestado"
-            :intereses-totales="interesesTotales"
-            :entrada="precioVivienda * (entrada / 100)"
+        :capital-prestado="capitalPrestado"
+        :intereses-totales="interesesTotales"
+        :entrada="precioVivienda * (entrada / 100)"
           />
         </div>
-        <div class="w-1/2 flex justify-center">
+        <div class="w-full md:w-1/2 flex justify-center">
           <MortgageLineChart
-            :labels="labels"
-            :capital-pendiente="capitalPendienteSerie"
-            :intereses-pagados="interesesPagadosSerie"
-            :cuota-mensual="cuotaMensual"
+        :labels="labels"
+        :capital-pendiente="capitalPendienteSerie"
+        :intereses-pagados="interesesPagadosSerie"
+        :cuota-mensual="cuotaMensual"
           />
         </div>
       </div>

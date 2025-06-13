@@ -1,5 +1,4 @@
 <template>
-  <!-- Usa el mismo nombre de ref definido en script -->
   <canvas ref="chartRef"></canvas>
 </template>
 
@@ -7,7 +6,6 @@
 import { onMounted, watch, ref } from 'vue';
 import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js';
 
-// Registramos los controladores y elementos necesarios
 Chart.register(PieController, ArcElement, Tooltip, Legend);
 
 // Definimos las props que recibirá el componente
@@ -17,22 +15,19 @@ const props = defineProps({
   interesesGanados: { type: Number, required: true }
 });
 
-// Referencia al elemento canvas
 const chartRef = ref(null);
 let chartInstance = null;
 
-// Función para (re)dibujar el gráfico
 const renderChart = () => {
   if (!chartRef.value) return;
 
-  // Obtenemos el contexto 2D
   const ctx = chartRef.value.getContext('2d');
   if (!ctx) {
     console.error('No se pudo obtener el contexto 2D del canvas');
     return;
   }
 
-  // Si ya existe una instancia previa, la destruimos
+  // Si ya existe una instancia previa se elimina
   if (chartInstance) {
     chartInstance.destroy();
   }
@@ -54,7 +49,6 @@ const renderChart = () => {
         legend: {
           position: 'bottom',
           labels: {
-            // Aumenta tamaño de fuente de la leyenda
             font: {
               size: 14
             }
@@ -65,7 +59,6 @@ const renderChart = () => {
   });
 };
 
-// Montamos y observamos cambios para actualizar
 onMounted(renderChart);
 watch(
   () => [props.capitalInicial, props.aportacionesPosteriores, props.interesesGanados],

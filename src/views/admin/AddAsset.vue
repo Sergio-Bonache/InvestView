@@ -1,17 +1,32 @@
 <script setup>
-
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
 const router = useRouter();
+const error = ref("");
+const showSuccessEditModal = ref(false);
 
-const sesion = localStorage.getItem("sesion");
-const rol = sesion ? JSON.parse(sesion).role : null;
+onMounted(() => {
+  let sesion;
+  try {
+    sesion = JSON.parse(sessionStorage.getItem("sesion"));
+  } catch (e) {
+    sessionStorage.removeItem("sesion");
+    router.push("/login");
+    return;
+  }
 
-if (rol != "admin") {
-  router.push("/");
-}
+  // Si no hay sesión o no es admin, redirigir al login
+  if (!sesion || sesion.role !== "admin") {
+    sessionStorage.removeItem("sesion");
+    router.push("/login");
+    return;
+  }
+
+  // Establecer el encabezado de autorización predeterminado para todas las solicitudes
+  axios.defaults.headers.common["Authorization"] = `Bearer ${sesion.token}`;
+});
 
 const form = ref({
   name: "",
@@ -20,8 +35,6 @@ const form = ref({
   trading_view_symbol: "",
   logo_url: ""
 });
-const error = ref("");
-const showSuccessEditModal = ref(false);
 
 function isValidUrl(url) {
   try {
@@ -56,7 +69,7 @@ async function crearActivo() {
     return;
   }
 
-  // Validar símbolo TradingView (debe contener ":")
+  // Validar símbolo TradingView
   if (!form.value.trading_view_symbol.includes(":")) {
     error.value = "El símbolo de TradingView debe contener dos puntos (ejemplo: NASDAQ:AAPL).";
     return;
@@ -77,7 +90,12 @@ async function crearActivo() {
       router.push("/admin/assets");
     }, 1500);
   } catch (e) {
-    error.value = e.response?.data?.message || "Error al crear el activo.";
+    if (e.response?.status === 401 || e.response?.status === 403) {
+      sessionStorage.removeItem("sesion");
+      router.push("/login");
+    } else {
+      error.value = e.response?.data?.message || "Error al crear el activo.";
+    }
     showSuccessEditModal.value = false;
   }
 }

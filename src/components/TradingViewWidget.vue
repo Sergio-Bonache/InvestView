@@ -18,7 +18,6 @@ function loadWidget() {
   const container = document.getElementById(widgetContainerId);
   if (!container) return;
 
-  // Limpiar contenido anterior (en caso de reusos)
   container.innerHTML = `
     <div class="tradingview-widget-container__widget"></div>
     <div class="tradingview-widget-copyright">

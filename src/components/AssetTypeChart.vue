@@ -18,7 +18,8 @@ const TARGET_DISTRIBUTION = {
   'cripto': 20
 };
 
-const MARGIN = 10; // 10% margen de error
+// 10% margen de error
+const MARGIN = 10; 
 
 const formatLabel = (type) => {
   switch(type) {
@@ -77,7 +78,7 @@ const diversificationStatus = computed(() => {
   );
 
   // Comprobar si los porcentajes están dentro del rango aceptable
-  const isWithinRange = originalLabels.every((type, index) => {
+  const isInRange = originalLabels.every((type, index) => {
     const target = TARGET_DISTRIBUTION[type];
     const actual = percentages[index];
     return Math.abs(actual - target) <= MARGIN;
@@ -89,7 +90,7 @@ const diversificationStatus = computed(() => {
       message: 'Tu portfolio no incluye todos los tipos de activos recomendados (ETF, Acciones y Criptomonedas).',
       color: 'text-yellow-600'
     };
-  } else if (!isWithinRange) {
+  } else if (!isInRange) {
     return {
       status: 'Diversificación desbalanceada',
       message: `Tu portfolio está desbalanceado. Objetivo: ETFs (50%), Acciones (30%), Cripto (20%). Considera ajustar las proporciones.`,

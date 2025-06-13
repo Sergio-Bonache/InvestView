@@ -22,26 +22,26 @@ const chartData = computed(() => {
       label: 'Valor por activo',
       data,
       backgroundColor: [
-        '#1E88E5', // Azul brillante
-        '#00ACC1', // Turquesa
-        '#43A047', // Verde esmeralda
-        '#7CB342', // Verde lima
-        '#FDD835', // Amarillo brillante
-        '#FB8C00', // Naranja brillante
-        '#E53935', // Rojo vibrante
-        '#8E24AA', // Púrpura
-        '#3949AB', // Índigo
-        '#00897B', // Verde azulado
-        '#FFA000', // Ámbar
-        '#6A1B9A', // Púrpura profundo
-        '#2E7D32', // Verde bosque
-        '#F57F17', // Amarillo dorado
-        '#C62828', // Rojo profundo
-        '#1565C0', // Azul marino
-        '#00BFA5', // Verde turquesa
-        '#FFC107', // Amarillo ámbar
-        '#FF6F00', // Naranja intenso
-        '#6A1B9A'  // Púrpura profundo
+        '#1E88E5',
+        '#00ACC1',
+        '#43A047',
+        '#7CB342',
+        '#FDD835',
+        '#FB8C00',
+        '#E53935',
+        '#8E24AA',
+        '#3949AB',
+        '#00897B',
+        '#FFA000',
+        '#6A1B9A',
+        '#2E7D32',
+        '#F57F17',
+        '#C62828',
+        '#1565C0',
+        '#00BFA5',
+        '#FFC107',
+        '#FF6F00',
+        '#6A1B9A'
       ],
       borderWidth: 1
     }]
@@ -80,7 +80,6 @@ onMounted(() => {
   }
 });
 
-// Observar cambios en los datos del portafolio
 watch(() => props.portfolio, () => {
   if (chart) {
     chart.data = chartData.value;

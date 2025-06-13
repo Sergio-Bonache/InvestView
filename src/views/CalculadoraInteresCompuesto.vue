@@ -8,7 +8,7 @@ const router = useRouter();
 const sesion = ref(null);
 
 onMounted(() => {
-  sesion.value = localStorage.getItem("sesion") ? JSON.parse(localStorage.getItem("sesion")) : null;
+  sesion.value = sessionStorage.getItem("sesion") ? JSON.parse(sessionStorage.getItem("sesion")) : null;
   if (sesion.value && sesion.value.role === "admin") {
     router.push("/");
     return;
@@ -138,20 +138,24 @@ const totalConInteresSerie = computed(() =>
           <div class="text-2xl font-bold text-gray-800 mt-1">{{ resultado.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€</div>
         </div>
       </div>
-      <div class="flex justify-center mt-12">
-        <div class="w-1/2 flex justify-center">
-          <CompoundInterestPieChart
-            :capital-inicial="capitalInicial"
-            :intereses-ganados="interesesGanados"
-            :aportaciones-posteriores="totalAportado - capitalInicial"
-          />
+      <div class="flex flex-col gap-12 mt-12">
+        <div class="flex justify-center">
+          <div class="w-full md:w-2/3 lg:w-1/2">
+        <CompoundInterestPieChart
+          :capital-inicial="capitalInicial"
+          :intereses-ganados="interesesGanados"
+          :aportaciones-posteriores="totalAportado - capitalInicial"
+        />
+          </div>
         </div>
-        <div class="w-1/2 flex justify-center">
-          <CompoundInterestLineChart
-            :labels="labels"
-            :aportaciones="aportacionesSerie"
-            :totalConInteres="totalConInteresSerie"
-          />
+        <div class="flex justify-center">
+          <div class="w-full md:w-2/3 lg:w-1/2">
+        <CompoundInterestLineChart
+          :labels="labels"
+          :aportaciones="aportacionesSerie"
+          :totalConInteres="totalConInteresSerie"
+        />
+          </div>
         </div>
       </div>
     </div>
