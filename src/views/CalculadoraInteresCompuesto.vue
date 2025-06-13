@@ -82,9 +82,13 @@ const totalConInteresSerie = computed(() =>
   <section class="container mt-15 mb-15 px-4 mx-auto">
     <h2 class="text-3xl font-medium text-gray-800 mb-6">Calculadora de Interés Compuesto</h2>
     <p class="mb-8 text-gray-700 text-xl">
-      La <strong>calculadora de interés compuesto</strong> te permite estimar cómo crecerán tus ahorros o inversiones a lo largo del tiempo, teniendo en cuenta un capital inicial, aportaciones periódicas, el interés anual y el plazo en años.
+      La <strong>calculadora de interés compuesto</strong> te permite estimar cómo crecerán tus ahorros o inversiones a
+      lo largo del tiempo, teniendo en cuenta un capital inicial, aportaciones periódicas, el interés anual y el plazo
+      en años.
       <br><br>
-      Para usarla, introduce el capital inicial, la cantidad que aportarás periódicamente, la frecuencia de esas aportaciones, el interés anual estimado y el número de años que mantendrás la inversión. La calculadora mostrará el capital final estimado, el total aportado y los intereses generados.
+      Para usarla, introduce el capital inicial, la cantidad que aportarás periódicamente, la frecuencia de esas
+      aportaciones, el interés anual estimado y el número de años que mantendrás la inversión. La calculadora mostrará
+      el capital final estimado, el total aportado y los intereses generados.
     </p>
     <form class="bg-gray-50 rounded-lg shadow-md p-6 space-y-6 border border-gray-200">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -92,19 +96,22 @@ const totalConInteresSerie = computed(() =>
           <label class="block text-gray-700 font-medium mb-2" for="capitalInicial">
             <span class="text-red-700 font-medium">*</span> Capital inicial (€)
           </label>
-          <input id="capitalInicial" type="number" min="0" v-model.number="capitalInicial" class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
+          <input id="capitalInicial" type="number" min="0" v-model.number="capitalInicial"
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
         </div>
         <div>
           <label class="block text-gray-700 font-medium mb-2" for="aportacion">
             <span class="text-red-700 font-medium">*</span> Aportación periódica (€)
           </label>
-          <input id="aportacion" type="number" min="0" v-model.number="aportacion" class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
+          <input id="aportacion" type="number" min="0" v-model.number="aportacion"
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
         </div>
         <div>
           <label class="block text-gray-700 font-medium mb-2" for="frecuencia">
             <span class="text-red-700 font-medium">*</span> Frecuencia de aportación
           </label>
-          <select id="frecuencia" v-model="frecuencia" class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none">
+          <select id="frecuencia" v-model="frecuencia"
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none">
             <option v-for="op in frecuenciaOpciones" :key="op.value" :value="op.value">{{ op.label }}</option>
           </select>
         </div>
@@ -112,13 +119,15 @@ const totalConInteresSerie = computed(() =>
           <label class="block text-gray-700 font-medium mb-2" for="interes">
             <span class="text-red-700 font-medium">*</span> Interés anual (%)
           </label>
-          <input id="interes" type="number" min="0" step="0.01" v-model.number="interes" class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
+          <input id="interes" type="number" min="0" step="0.01" v-model.number="interes"
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
         </div>
         <div class="md:col-span-2">
           <label class="block text-gray-700 font-medium mb-2" for="tiempo">
             <span class="text-red-700 font-medium">*</span> Tiempo (años)
           </label>
-          <input id="tiempo" type="number" min="1" v-model.number="tiempo" class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
+          <input id="tiempo" type="number" min="1" v-model.number="tiempo"
+            class="w-full rounded bg-white border-gray-300 shadow-sm py-2 px-4 outline-none" />
         </div>
       </div>
     </form>
@@ -127,40 +136,38 @@ const totalConInteresSerie = computed(() =>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
         <div>
           <div class="text-dark-500 text-xl">Total aportado</div>
-          <div class="text-2xl font-bold text-blue-600 mt-1">{{ totalAportado.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€</div>
+          <div class="text-2xl font-bold text-blue-600 mt-1">{{ totalAportado.toLocaleString(undefined,
+            {maximumFractionDigits: 2}) }}€</div>
         </div>
         <div>
           <div class="text-dark-500 text-xl">Intereses ganados</div>
-          <div class="text-2xl font-bold text-green-600 mt-1">{{ interesesGanados.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€</div>
+          <div class="text-2xl font-bold text-green-600 mt-1">{{ interesesGanados.toLocaleString(undefined,
+            {maximumFractionDigits: 2}) }}€</div>
         </div>
         <div>
           <div class="text-dark-500 text-xl">Capital final</div>
-          <div class="text-2xl font-bold text-gray-800 mt-1">{{ resultado.toLocaleString(undefined, {maximumFractionDigits: 2}) }}€</div>
+          <div class="text-2xl font-bold text-gray-800 mt-1">{{ resultado.toLocaleString(undefined,
+            {maximumFractionDigits: 2}) }}€</div>
         </div>
       </div>
-      <div class="flex flex-col gap-12 mt-12">
-        <div class="flex justify-center">
-          <div class="w-full md:w-2/3 lg:w-1/2">
-        <CompoundInterestPieChart
-          :capital-inicial="capitalInicial"
-          :intereses-ganados="interesesGanados"
-          :aportaciones-posteriores="totalAportado - capitalInicial"
-        />
+      <div class="flex flex-col md:flex-row gap-12 mt-12">
+        <div class="flex-1 flex justify-center">
+          <div class="w-full md:w-4/5 lg:w-2/3">
+        <CompoundInterestPieChart :capital-inicial="capitalInicial" :intereses-ganados="interesesGanados"
+          :aportaciones-posteriores="totalAportado - capitalInicial" />
           </div>
         </div>
-        <div class="flex justify-center">
-          <div class="w-full md:w-2/3 lg:w-1/2">
-        <CompoundInterestLineChart
-          :labels="labels"
-          :aportaciones="aportacionesSerie"
-          :totalConInteres="totalConInteresSerie"
-        />
+        <div class="flex-1 flex justify-center">
+          <div class="w-full md:w-4/5 lg:w-2/3">
+        <CompoundInterestLineChart :labels="labels" :aportaciones="aportacionesSerie"
+          :totalConInteres="totalConInteresSerie" />
           </div>
         </div>
       </div>
     </div>
     <p class="mt-6 italic text-xl text-gray-500">
-      <span class="text-red-700 font-medium">*</span> El cálculo es orientativo y no tiene en cuenta impuestos, comisiones ni inflación.
+      <span class="text-red-700 font-medium">*</span> El cálculo es orientativo y no tiene en cuenta impuestos,
+      comisiones ni inflación.
     </p>
   </section>
 </template>
